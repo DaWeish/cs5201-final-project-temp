@@ -9,6 +9,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <memory>
 #include <iostream>
 
 #include "../MathVector.h"
@@ -29,14 +30,15 @@ class IMathMatrix
 
     virtual IMathMatrix<T>& operator*=(const T& scaler) = 0;
 
-    virtual IMathMatrix<T>* operator+(const IMathMatrix<T>& rhs) const = 0;
-    virtual IMathMatrix<T>* operator-(const IMathMatrix<T>& rhs) const = 0;
-    virtual IMathMatrix<T>* operator-() const = 0;
-    virtual IMathMatrix<T>* operator*(const IMathMatrix<T>& rhs) const = 0;
-    virtual IMathMatrix<T>* operator*(const T& scaler) const = 0;
-
-    virtual MathVector<T>& operator[](size_t index) = 0;
-    virtual const MathVector<T>& operator[](size_t index) const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> operator+
+      (const IMathMatrix<T>& rhs) const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> operator-
+      (const IMathMatrix<T>& rhs) const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> operator-() const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> operator*
+      (const IMathMatrix<T>& rhs) const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> operator*
+      (const T& scaler) const = 0;
 
     virtual T& operator()(size_t row, size_t column) = 0;
     virtual const T& operator()(size_t row, size_t column) const = 0;
@@ -49,11 +51,12 @@ class IMathMatrix
     virtual void print(std::ostream& os) const = 0;
     virtual void read(std::istream& is) = 0;
 
-    virtual IMathMatrix<T>* clone() = 0; 
+    virtual std::unique_ptr<IMathMatrix<T>> transpose() const = 0;
+    virtual std::unique_ptr<IMathMatrix<T>> clone() const = 0; 
 };
 
 template <class T>
-IMathMatrix<T>* operator*(const T& scaler, const IMathMatrix<T>& rhs)
+std::unique_ptr<IMathMatrix<T>> operator*(const T& scaler, const IMathMatrix<T>& rhs)
 {
   return rhs * scaler;
 }

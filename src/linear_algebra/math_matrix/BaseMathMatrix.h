@@ -12,6 +12,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <memory>
 #include <iostream>
 
 #include "IMathMatrix.h"
@@ -74,17 +75,6 @@ class BaseMathMatrix : public IMathMatrix<T> {
       return static_cast<const Derived<T>*>(this)->opTimes(scaler);
     }
 
-    virtual MathVector<T>& operator[](size_t index)
-    {
-      return static_cast<Derived<T>*>(this)->at(index);
-    }
-
-    virtual const MathVector<T>& operator[](size_t index) const
-    {
-      return static_cast<const Derived<T>*>(this)->at(index);
-    }
-
-    // This is the multidimensional index operator for a matrix
     virtual T& operator()(size_t row, size_t column)
     {
       return static_cast<Derived<T>*>(this)->at(row, column);
@@ -120,9 +110,16 @@ class BaseMathMatrix : public IMathMatrix<T> {
       static_cast<Derived<T>*>(this)->readFromStream(is);
     }
 
-    virtual IMathMatrix<T>* clone()
+    virtual std::unique_ptr<IMathMatrix<T>> transpose() const
     {
-      return new Derived<T>(static_cast<const Derived<T>&>(*this));
+      return static_cast<const Derived<T>*>(this)->getTranspose();
+    }
+
+    virtual std::unique_ptr<IMathMatrix<T>> clone() const
+    {
+      std::unique_ptr<Derived<T>> result
+        (new Derived<T>(static_cast<const Derived<T>&>(*this)));
+      return result;
     }
 };
 
