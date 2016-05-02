@@ -50,27 +50,32 @@ class BaseMathMatrix : public IMathMatrix<T> {
       return static_cast<Derived<T>*>(this)->opTimesEquals(scaler);
     }
 
-    virtual IMathMatrix<T>* operator+(const IMathMatrix<T>& rhs) const
+    virtual std::unique_ptr<IMathMatrix<T>> operator+(const IMathMatrix<T>& rhs) const
     {
       return static_cast<const Derived<T>*>(this)->opPlus(rhs);
     }
 
-    virtual IMathMatrix<T>* operator-(const IMathMatrix<T>& rhs) const
+    virtual std::unique_ptr<IMathMatrix<T>> operator-(const IMathMatrix<T>& rhs) const
     {
       return static_cast<const Derived<T>*>(this)->opMinus(rhs);
     }
 
-    virtual IMathMatrix<T>* operator-() const
+    virtual std::unique_ptr<IMathMatrix<T>> operator-() const
     {
       return static_cast<const Derived<T>*>(this)->opMinus();
     }
 
-    virtual IMathMatrix<T>* operator*(const IMathMatrix<T>& rhs) const
+    virtual std::unique_ptr<IMathMatrix<T>> operator*(const IMathMatrix<T>& rhs) const
     {
       return static_cast<const Derived<T>*>(this)->opTimes(rhs);
     }
 
-    virtual IMathMatrix<T>* operator*(const T& scaler) const
+    virtual MathVector<T> operator*(const MathVector<T>& rhs) const
+    {
+      return static_cast<const Derived<T>*>(this)->opTimes(rhs);
+    }
+
+    virtual std::unique_ptr<IMathMatrix<T>> operator*(const T& scaler) const
     {
       return static_cast<const Derived<T>*>(this)->opTimes(scaler);
     }

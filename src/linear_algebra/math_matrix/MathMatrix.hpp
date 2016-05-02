@@ -4,6 +4,7 @@
  */
 
 #include <stdexcept>
+#include <memory>
 #include <sstream>
 
 #include "MathMatrix.h"
@@ -22,7 +23,7 @@ template <class T>
 MathMatrix<T>::MathMatrix(const MathMatrix<T>& other) : myColumns(other.myColumns)
 {
   myRows = Array<MathVector<T>*>(other.getRows());
-  for (auto i = 0, numRows = (int)other.getRows(); i < numRows; ++i)
+  for (int i = 0, numRows = other.getRows(); i < numRows; ++i)
   {
     myRows[i] = new MathVector<T>(*(other.myRows[i]));
   }
@@ -79,7 +80,7 @@ MathMatrix<T>& MathMatrix<T>::opAssign(const IMathMatrix<T>& rhs)
   for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
   {
     myRows[i] = new MathVector<T>(myColumns);
-    for (int j = 0; j < myColumns; ++j)
+    for (int j = 0; j < (int)myColumns; ++j)
     {
       at(i, j) = rhs(i, j);
     }
@@ -91,12 +92,12 @@ MathMatrix<T>& MathMatrix<T>::opAssign(const IMathMatrix<T>& rhs)
 template <class T>
 bool MathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 {
-  if (myColumns != (int)rhs.cols()) return false;
+  if (myColumns != rhs.cols()) return false;
   if (myRows.size() != rhs.rows()) return false;
 
   for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
   {
-    for (int j = 0; j < myColumns; ++j)
+    for (int j = 0; j < (int)myColumns; ++j)
     {
       if (at(i, j) != rhs(i, j)) return false;
     }
@@ -107,11 +108,11 @@ bool MathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 template <class T>
 MathMatrix<T>& MathMatrix<T>::opPlusEquals(const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
-    for (auto i = 0, numRows = (int)getRows(); i < numRows; ++i)
+    for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (auto j = 0; j < myColumns; ++j)
+      for (int j = 0; j < (int)myColumns; ++j)
       {
         at(i, j) += rhs(i, j);
       }
@@ -127,11 +128,11 @@ MathMatrix<T>& MathMatrix<T>::opPlusEquals(const IMathMatrix<T>& rhs)
 template <class T>
 MathMatrix<T>& MathMatrix<T>::opMinusEquals(const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
-    for (auto i = 0, numRows = (int)getRows(); i < numRows; ++i)
+    for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (auto j = 0; j < myColumns; ++j)
+      for (int j = 0; j < (int)myColumns; ++j)
       {
         at(i, j) -= rhs(i, j);
       }
@@ -155,19 +156,20 @@ MathMatrix<T>& MathMatrix<T>::opTimesEquals(const T& scaler)
 }
 
 template <class T>
-MathMatrix<T>* MathMatrix<T>::opPlus(const IMathMatrix<T>& rhs) const
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::opPlus
+    (const IMathMatrix<T>& rhs) const
 {
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(*this);
+  std::unique_ptr<IMathMatrix<T>> result(new MathMatrix<T>(*this));
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < myColumns; ++col)
+    for (int col = 0; col < (int)myColumns; ++col)
     {
-      result->at(row, col) += rhs(row, col);
+      (*result)(row, col) += rhs(row, col);
     }
   }
 
@@ -175,19 +177,20 @@ MathMatrix<T>* MathMatrix<T>::opPlus(const IMathMatrix<T>& rhs) const
 }
 
 template <class T>
-MathMatrix<T>* MathMatrix<T>::opMinus(const IMathMatrix<T>& rhs) const
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::opMinus
+    (const IMathMatrix<T>& rhs) const
 {
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
     throw std::domain_error("Cannot subtract two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(*this);
+  std::unique_ptr<IMathMatrix<T>> result(new MathMatrix<T>(*this));
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < myColumns; ++col)
+    for (int col = 0; col < (int)myColumns; ++col)
     {
-      result->at(row, col) -= rhs(row, col);
+      (*result)(row, col) -= rhs(row, col);
     }
   }
 
@@ -195,60 +198,71 @@ MathMatrix<T>* MathMatrix<T>::opMinus(const IMathMatrix<T>& rhs) const
 }
 
 template <class T>
-MathMatrix<T>* MathMatrix<T>::opMinus() const
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::opMinus() const
 {
-  MathMatrix<T>* result = new MathMatrix<T>(*this);
+  std::unique_ptr<IMathMatrix<T>> result(new MathMatrix<T>(*this));
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < myColumns; ++col)
+    for (int col = 0; col < (int)myColumns; ++col)
     {
-      result->at(row, col) = -result->at(row, col);
+      (*result)(row, col) = -((*result)(row, col));
     }
   }
   return result;
 }
 
 template <class T>
-MathMatrix<T>* MathMatrix<T>::opTimes(const IMathMatrix<T>& rhs) const
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::opTimes
+    (const IMathMatrix<T>& rhs) const
 {
-  if (myColumns != (int)rhs.rows()) {
+  if (myColumns != rhs.rows()) {
     throw std::domain_error("Cannot multiply matrices of incorrect dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), rhs.cols());
+  std::unique_ptr<IMathMatrix<T>> result
+    (new MathMatrix<T>(myRows.size(), rhs.cols()));
   T sum;
   for (int lhsRow = 0, numRows = myRows.size(); lhsRow < numRows; ++lhsRow)
   {
     for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
     {
       sum = 0;
-      for (int element = 0; element < myColumns; ++element)
+      for (int element = 0; element < (int)myColumns; ++element)
       {
         sum += at(lhsRow, element) * rhs(element, rhsCol);
       }
-      result->at(lhsRow, rhsCol) = sum;
+      (*result)(lhsRow, rhsCol) = sum;
     }
   }
   return result;
 }
 
 template <class T>
-MathMatrix<T>* MathMatrix<T>::opTimes(const T& scaler) const
+MathVector<T> MathMatrix<T>::opTimes(const MathVector<T>& rhs) const
 {
-  MathMatrix<T>* result = new MathMatrix<T>(*this);
-  return &(result->opTimesEquals(scaler));
+  return rhs;
 }
 
 template <class T>
-MathVector<T>& MathMatrix<T>::at(size_t index)
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::opTimes(const T& scaler) const
 {
-  return *(myRows.at(index));
+  std::unique_ptr<IMathMatrix<T>> result(new MathMatrix<T>(*this));
+  (*result) *= scaler;
+  return result;
 }
 
 template <class T>
-const MathVector<T>& MathMatrix<T>::at(size_t index) const
+std::unique_ptr<IMathMatrix<T>> MathMatrix<T>::getTranspose() const
 {
-  return *(myRows.at(index));
+  std::unique_ptr<IMathMatrix<T>> result(new MathMatrix<T>(myColumns, getRows()));
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    for (int j = 0; j < (int)myColumns; ++j)
+    {
+      (*result)(i, j) = this->at(j, i);
+    }
+  }
+  return result;
 }
 
 template <class T>
@@ -284,7 +298,7 @@ void MathMatrix<T>::swapRows(size_t row1, size_t row2)
 template <class T>
 void MathMatrix<T>::printToStream(std::ostream& os) const
 {
-  for (auto i = 0, numRows = (int)getRows(); i < numRows; ++i)
+  for (int i = 0, numRows = getRows(); i < numRows; ++i)
   {
     os << *(myRows[i]) << "\n";
   }

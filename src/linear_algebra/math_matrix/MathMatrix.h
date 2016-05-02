@@ -9,6 +9,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <memory>
 #include <iostream>
 
 #include "../../containers/Array.h"
@@ -37,14 +38,15 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
 
     MathMatrix<T>& opTimesEquals(const T& scaler);
 
-    MathMatrix<T>* opPlus(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opMinus(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opMinus() const;
-    MathMatrix<T>* opTimes(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opTimes(const T& scaler) const;
+    std::unique_ptr<IMathMatrix<T>> opPlus(const IMathMatrix<T>& rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opMinus(const IMathMatrix<T>& rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opMinus() const;
+    std::unique_ptr<IMathMatrix<T>> opTimes(const IMathMatrix<T>& rhs) const;
+    MathVector<T> opTimes(const MathVector<T>& rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opTimes(const T& scaler) const;
 
-    MathVector<T>& at(size_t index);
-    const MathVector<T>& at(size_t index) const;
+    std::unique_ptr<IMathMatrix<T>> getTranspose() const;
+
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
 
@@ -54,13 +56,12 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
     void swapRows(size_t row1, size_t row2);
     void printToStream(std::ostream& os) const;
     void readFromStream(std::istream& is);
-
-  private:
     void swap(MathMatrix& other);
 
+  private:
+    // TODO make this a unique ptr array
     Array<MathVector<T>*> myRows;
-    int myColumns;
-    constexpr static int DEFAULT_SIZE = 2;
+    size_t myColumns;
 };
 
 #include "MathMatrix.hpp"

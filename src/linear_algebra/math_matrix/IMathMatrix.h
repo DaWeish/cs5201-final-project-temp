@@ -37,6 +37,7 @@ class IMathMatrix
     virtual std::unique_ptr<IMathMatrix<T>> operator-() const = 0;
     virtual std::unique_ptr<IMathMatrix<T>> operator*
       (const IMathMatrix<T>& rhs) const = 0;
+    virtual MathVector<T> operator*(const MathVector<T>& rhs) const = 0;
     virtual std::unique_ptr<IMathMatrix<T>> operator*
       (const T& scaler) const = 0;
 
