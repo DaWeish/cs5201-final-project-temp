@@ -10,6 +10,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <memory>
 #include <iostream>
 
 #include "../../containers/Array.h"
@@ -39,14 +40,15 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
 
     UpTriangleMathMatrix<T>& opTimesEquals(const T& scaler);
 
-    MathMatrix<T>* opPlus(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opMinus(const IMathMatrix<T>& rhs) const;
-    UpTriangleMathMatrix<T>* opMinus() const;
-    MathMatrix<T>* opTimes(const IMathMatrix<T>& rhs) const;
-    UpTriangleMathMatrix<T>* opTimes(const T& scaler) const;
+    std::unique_ptr<IMathMatrix<T>> opPlus(const IMathMatrix<T>& rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opMinus(const IMathMatrix<T>& rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opMinus() const;
+    std::unique_ptr<IMathMatrix<T>> opTimes(const IMathMatrix<T>& rhs) const;
+    MathVector<T> opTimes(const MathVector<T> rhs) const;
+    std::unique_ptr<IMathMatrix<T>> opTimes(const T& scaler) const;
 
-    MathVector<T>& at(size_t index);
-    const MathVector<T>& at(size_t index) const;
+    std::unique_ptr<IMathMatrix<T>> getTranspose() const;
+
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
 
@@ -56,14 +58,12 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     void swapRows(size_t row1, size_t row2);
     void printToStream(std::ostream& os) const;
     void readFromStream(std::istream& is);
-
-  private:
     void swap(UpTriangleMathMatrix& other);
-
+  private:
+    // TODO change this to an array of unique_ptrs
     Array<MathVector<T>*> myRows;
+    size_t myColumns;
     const T zero = 0;
-    int myColumns;
-    constexpr static int DEFAULT_SIZE = 2;
 };
 
 #include "UpTriangleMathMatrix.hpp"

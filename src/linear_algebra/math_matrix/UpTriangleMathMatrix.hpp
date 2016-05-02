@@ -4,6 +4,7 @@
  */
 
 #include <stdexcept>
+#include <memory>
 
 #include "MathMatrix.h"
 #include "UpTriangleMathMatrix.h"
@@ -161,20 +162,22 @@ UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opTimesEquals(const T& scaler)
 }
 
 template <class T>
-MathMatrix<T>* UpTriangleMathMatrix<T>::opPlus(const IMathMatrix<T>& rhs) const
+std::unique_ptr<IMathMatrix<T>> UpTriangleMathMatrix<T>::opPlus
+    (const IMathMatrix<T>& rhs) const
 {
   if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), myColumns);
+  std::unique_ptr<IMathMatrix<T>> result
+    (new MathMatrix<T>(myRows.size(), myColumns));
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
     for (int col = 0; col < myColumns; ++col)
     {
-      if (row <= col) result->at(row, col) = at(row, col) + rhs(row, col);
-      else result->at(row, col) = rhs(row, col);
+      if (row <= col) (*result)(row, col) = at(row, col) + rhs(row, col);
+      else (*result)(row, col) = rhs(row, col);
     }
   }
   return result;
