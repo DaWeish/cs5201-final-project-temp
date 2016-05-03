@@ -278,15 +278,37 @@ MathMatrix<T> MathMatrix<T>::operator*(const T& scaler) const
 template <class T>
 MathVector<T> MathMatrix<T>::operator*(const MathVector<T>& rhs) const
 {
-  // TODO implement this method
-  return rhs;
+  if (myColumns != rhs.size()) {
+    throw std::domain_error("Cannot multiply by MathVector of incorrect dimensions!");
+  }
+
+  T sum;
+  MathVector<T> result(myRows.size());
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    sum = 0;
+    for (int j = 0; j < (int)myColumns; ++j)
+    {
+      sum += at(i, j) * rhs[j];
+    }
+    result[i] = sum;
+  }
+  
+  return result;
 }
 
 template <class T>
 MathMatrix<T> MathMatrix<T>::transpose() const
 {
-  // TODO actually implement the transpose method
-  return *this;
+  MathMatrix<T> result(myColumns, myRows.size());
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    for (int j = 0; j < (int)myColumns; ++j)
+    {
+      result(j, i) = at(i, j);
+    }
+  }
+  return result;
 }
 
 template <class T>
