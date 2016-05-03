@@ -36,7 +36,6 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
 
     MathMatrix& operator+=(const IMathMatrix<T>& rhs);
     MathMatrix& operator-=(const IMathMatrix<T>& rhs);
-    MathMatrix& operator*=(const IMathMatrix<T>& rhs);
     MathMatrix& operator*=(const T& scaler);
 
     MathMatrix operator+(const IMathMatrix<T>& rhs) const;
@@ -45,6 +44,9 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
     MathMatrix operator*(const IMathMatrix<T>& rhs) const;
     MathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
+
+    MathVector<T>& operator[](size_t index);
+    const MathVector<T>& operator[](size_t index) const;
 
     MathMatrix transpose() const;
     MathMatrix swapRows(size_t row1, size_t row2);
