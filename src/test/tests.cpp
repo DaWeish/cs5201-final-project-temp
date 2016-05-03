@@ -1,10 +1,10 @@
 #include "gtest/gtest.h"
 
-#include "ArrayListTest.h"
+//#include "ArrayListTest.h"
 #include "MathVectorTest.h"
 #include "ArrayTest.h"
 #include "MathMatrixTest.h"
-#include "GaussianEliminationTest.h"
+//#include "GaussianEliminationTest.h"
 
 int main(int argc, char** argv)
 {

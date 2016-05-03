@@ -205,7 +205,7 @@ MathMatrix<T> MathMatrix<T>::operator+(const IMathMatrix<T>& rhs) const
   {
     for (int col = 0; col < (int)myColumns; ++col)
     {
-      result->at(row, col) += rhs(row, col);
+      result.at(row, col) += rhs(row, col);
     }
   }
 
@@ -225,7 +225,7 @@ MathMatrix<T> MathMatrix<T>::operator-(const IMathMatrix<T>& rhs) const
   {
     for (int col = 0; col < (int)myColumns; ++col)
     {
-      result->at(row, col) -= rhs(row, col);
+      result.at(row, col) -= rhs(row, col);
     }
   }
 
@@ -258,7 +258,7 @@ MathMatrix<T> MathMatrix<T>::operator*(const IMathMatrix<T>& rhs) const
     for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
     {
       sum = 0;
-      for (int element = 0; element < myColumns; ++element)
+      for (int element = 0; element < (int)myColumns; ++element)
       {
         sum += at(lhsRow, element) * rhs(element, rhsCol);
       }
@@ -271,8 +271,22 @@ MathMatrix<T> MathMatrix<T>::operator*(const IMathMatrix<T>& rhs) const
 template <class T>
 MathMatrix<T> MathMatrix<T>::operator*(const T& scaler) const
 {
-  MathMatrix<T>* result(*this);
+  MathMatrix<T> result(*this);
   return (result *= scaler);
+}
+
+template <class T>
+MathVector<T> MathMatrix<T>::operator*(const MathVector<T>& rhs) const
+{
+  // TODO implement this method
+  return rhs;
+}
+
+template <class T>
+MathMatrix<T> MathMatrix<T>::transpose() const
+{
+  // TODO actually implement the transpose method
+  return *this;
 }
 
 template <class T>
