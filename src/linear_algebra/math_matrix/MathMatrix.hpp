@@ -37,7 +37,7 @@ MathMatrix<T>::MathMatrix(const IMathMatrix<T>& other) : myColumns(other.cols())
     myRows[i] = new MathVector<T>(myColumns);
     for (int j = 0; j < (int)myColumns; ++j)
     {
-      myRows[i][j] = other(i, j);
+      (*(myRows[i]))[j] = other(i, j);
     }
   }
 }

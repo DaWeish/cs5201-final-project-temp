@@ -200,3 +200,34 @@ TEST_F(MathMatrixTest, MatrixVectorMultiply)
 
   EXPECT_TRUE(result == matrix1*vec);
 }
+
+TEST_F(MathMatrixTest, IMathMatrixTest)
+{
+  MathMatrix<double> matrix1(2, 2);
+  matrix1(0, 0) = 1;
+  matrix1(0, 1) = 2;
+  matrix1(1, 0) = 3;
+  matrix1(1, 1) = 1;
+
+  MathMatrix<double> matrix(2, 3);
+  IMathMatrix<double>& matrix2 = matrix;
+  matrix2(0, 0) = 2;
+  matrix2(0, 1) = 3;
+  matrix2(0, 2) = 3;
+  matrix2(1, 0) = 1;
+  matrix2(1, 1) = 1;
+  matrix2(1, 2) = 2;
+ 
+  MathMatrix<double> result(2, 3);
+  result(0, 0) = 4;
+  result(0, 1) = 5;
+  result(0, 2) = 7;
+  result(1, 0) = 7;
+  result(1, 1) = 10;
+  result(1, 2) = 11;
+
+  EXPECT_TRUE(result == matrix1 * matrix2);
+
+  matrix1 = matrix2;
+  EXPECT_TRUE(matrix1 == matrix);
+}
