@@ -34,6 +34,26 @@ class BaseMathMatrix : public IMathMatrix<T> {
       return !operator==(rhs);
     }
 
+    virtual IMathMatrix<T>& operator+=(const IMathMatrix<T>& rhs)
+    {
+      return static_cast<Derived<T>*>(this)->opPlusEquals(rhs);
+    }
+
+    virtual IMathMatrix<T>& operator-=(const IMathMatrix<T>& rhs)
+    {
+      return static_cast<Derived<T>*>(this)->opMinusEquals(rhs);
+    }
+
+    virtual IMathMatrix<T>& operator*=(const IMathMatrix<T>& rhs)
+    {
+      return static_cast<Derived<T>*>(this)->opTimesEquals(rhs);
+    }
+
+    virtual IMathMatrix<T>& operator*=(const T& scaler)
+    {
+      return static_cast<Derived<T>*>(this)->opTimesEquals(scaler);
+    }
+
     virtual T& operator()(size_t row, size_t column)
     {
       return static_cast<Derived<T>*>(this)->at(row, column);

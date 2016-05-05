@@ -24,6 +24,11 @@ class IMathMatrix
     virtual bool operator==(const IMathMatrix<T>& rhs) const = 0;
     virtual bool operator!=(const IMathMatrix<T>& rhs) const = 0;
 
+    virtual IMathMatrix& operator+=(const IMathMatrix<T>& rhs) = 0;
+    virtual IMathMatrix& operator-=(const IMathMatrix<T>& rhs) = 0;
+    virtual IMathMatrix& operator*=(const IMathMatrix<T>& rhs) = 0;
+    virtual IMathMatrix& operator*=(const T& scaler) = 0;
+
     virtual T& operator()(size_t row, size_t column) = 0;
     virtual const T& operator()(size_t row, size_t column) const = 0;
 

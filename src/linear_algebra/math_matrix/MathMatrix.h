@@ -34,9 +34,10 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
     bool operator==(const MathMatrix& rhs) const;
     bool operator!=(const MathMatrix& rhs) const;
 
-    MathMatrix& operator+=(const IMathMatrix<T>& rhs);
-    MathMatrix& operator-=(const IMathMatrix<T>& rhs);
-    MathMatrix& operator*=(const T& scaler);
+    MathMatrix& opPlusEquals(const IMathMatrix<T>& rhs);
+    MathMatrix& opMinusEquals(const IMathMatrix<T>& rhs);
+    MathMatrix& opTimesEquals(const IMathMatrix<T>& rhs);
+    MathMatrix& opTimesEquals(const T& scaler);
 
     MathMatrix operator+(const IMathMatrix<T>& rhs) const;
     MathMatrix operator-(const IMathMatrix<T>& rhs) const;

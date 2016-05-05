@@ -143,7 +143,7 @@ bool MathMatrix<T>::operator!=(const MathMatrix<T>& rhs) const
 }
 
 template <class T>
-MathMatrix<T>& MathMatrix<T>::operator+=(const IMathMatrix<T>& rhs)
+MathMatrix<T>& MathMatrix<T>::opPlusEquals(const IMathMatrix<T>& rhs)
 {
   if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
@@ -163,7 +163,7 @@ MathMatrix<T>& MathMatrix<T>::operator+=(const IMathMatrix<T>& rhs)
 }
 
 template <class T>
-MathMatrix<T>& MathMatrix<T>::operator-=(const IMathMatrix<T>& rhs)
+MathMatrix<T>& MathMatrix<T>::opMinusEquals(const IMathMatrix<T>& rhs)
 {
   if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
@@ -183,7 +183,15 @@ MathMatrix<T>& MathMatrix<T>::operator-=(const IMathMatrix<T>& rhs)
 }
 
 template <class T>
-MathMatrix<T>& MathMatrix<T>::operator*=(const T& scaler)
+MathMatrix<T>& MathMatrix<T>::opTimesEquals(const IMathMatrix<T>& rhs)
+{
+  MathMatrix<T> result = (*this) * rhs;
+  swap(result);
+  return (*this);
+}
+
+template <class T>
+MathMatrix<T>& MathMatrix<T>::opTimesEquals(const T& scaler)
 {
   for (auto& row : myRows)
   {
