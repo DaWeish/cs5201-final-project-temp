@@ -22,10 +22,10 @@ template <class T>
 class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
 {
   public:
-
     UpTriangleMathMatrix() : myColumns(0) {}
-    UpTriangleMathMatrix(size_t rows, size_t cols);
+    explicit UpTriangleMathMatrix(size_t rows, size_t cols = 1);
     UpTriangleMathMatrix(const UpTriangleMathMatrix& other);
+    UpTriangleMathMatrix(const IMathMatrix<T>& other);
     UpTriangleMathMatrix(UpTriangleMathMatrix&& other);
     ~UpTriangleMathMatrix();
 
@@ -33,37 +33,37 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix<T>& operator=(UpTriangleMathMatrix rhs);
 
     bool opEquality(const IMathMatrix<T>& rhs) const;
+    bool operator==(const UpTriangleMathMatrix& rhs) const;
+    bool operator!=(const UpTriangleMathMatrix& rhs) const;
 
-    UpTriangleMathMatrix<T>& opPlusEquals(const IMathMatrix<T>& rhs);
-    UpTriangleMathMatrix<T>& opMinusEquals(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& operator+=(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& operator-=(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& operator*=(const T& scaler);
 
-    UpTriangleMathMatrix<T>& opTimesEquals(const T& scaler);
+    UpTriangleMathMatrix operator+(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix operator-(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix operator-() const;
+    UpTriangleMathMatrix operator*(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix operator*(const T& scaler) const;
+    MathVector<T> operator*(const MathVector<T>& rhs) const;
 
-    MathMatrix<T>* opPlus(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opMinus(const IMathMatrix<T>& rhs) const;
-    UpTriangleMathMatrix<T>* opMinus() const;
-    MathMatrix<T>* opTimes(const IMathMatrix<T>& rhs) const;
-    UpTriangleMathMatrix<T>* opTimes(const T& scaler) const;
+    UpTriangleMathMatrix transpose() const;
+    UpTriangleMathMatrix swapRows(size_t row1, size_t row2);
 
-    MathVector<T>& at(size_t index);
-    const MathVector<T>& at(size_t index) const;
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
 
     size_t getRows() const;
     size_t getCols() const;
 
-    void swapRows(size_t row1, size_t row2);
+    void swap(UpTriangleMathMatrix& other);
     void printToStream(std::ostream& os) const;
     void readFromStream(std::istream& is);
 
   private:
-    void swap(UpTriangleMathMatrix& other);
-
     Array<MathVector<T>*> myRows;
     const T zero = 0;
-    int myColumns;
-    constexpr static int DEFAULT_SIZE = 2;
+    size_t myColumns;
 };
 
 #include "UpTriangleMathMatrix.hpp"
