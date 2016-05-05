@@ -36,9 +36,10 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     bool operator==(const UpTriangleMathMatrix& rhs) const;
     bool operator!=(const UpTriangleMathMatrix& rhs) const;
 
-    UpTriangleMathMatrix& operator+=(const IMathMatrix<T>& rhs);
-    UpTriangleMathMatrix& operator-=(const IMathMatrix<T>& rhs);
-    UpTriangleMathMatrix& operator*=(const T& scaler);
+    UpTriangleMathMatrix& opPlusEquals(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& opMinusEquals(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& opTimesEquals(const IMathMatrix<T>& rhs);
+    UpTriangleMathMatrix& opTimesEquals(const T& scaler);
 
     UpTriangleMathMatrix operator+(const IMathMatrix<T>& rhs) const;
     UpTriangleMathMatrix operator-(const IMathMatrix<T>& rhs) const;
