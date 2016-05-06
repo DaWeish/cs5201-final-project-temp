@@ -26,13 +26,16 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix() : myColumns(0) {}
     explicit UpTriangleMathMatrix(size_t rows, size_t cols = 1);
     UpTriangleMathMatrix(const UpTriangleMathMatrix& other);
-    UpTriangleMathMatrix(const IMathMatrix<T>& other);
+    explicit UpTriangleMathMatrix(const IMathMatrix<T>& other);
     UpTriangleMathMatrix(UpTriangleMathMatrix&& other);
     ~UpTriangleMathMatrix();
 
+    using IMathMatrix<T>::operator=;
     UpTriangleMathMatrix<T>& opAssign(const IMathMatrix<T>& rhs);
     UpTriangleMathMatrix<T>& operator=(UpTriangleMathMatrix rhs);
 
+    using IMathMatrix<T>::operator==;
+    using IMathMatrix<T>::operator!=;
     bool opEquality(const IMathMatrix<T>& rhs) const;
     bool operator==(const UpTriangleMathMatrix& rhs) const;
     bool operator!=(const UpTriangleMathMatrix& rhs) const;
@@ -52,7 +55,7 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
 
-    LowTriangleMathMatrix<T> transpose() const;
+//    LowTriangleMathMatrix<T> transpose() const;
 
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
