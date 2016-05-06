@@ -5,7 +5,7 @@
 #include "ArrayTest.h"
 #include "MathMatrixTest.h"
 #include "UpTriangleMathMatrixTest.h"
-//#include "GaussianEliminationTest.h"
+#include "GaussianEliminationSolverTest.h"
 
 int main(int argc, char** argv)
 {

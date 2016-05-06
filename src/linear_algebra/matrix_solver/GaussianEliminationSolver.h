@@ -22,7 +22,7 @@
 // brief This class implements a functor for performing Gaussian Elimination
 ////////////////////////////////////////////////////////////////////////////////
 template <class T>
-class GaussianElimination : public IMatrixSolver<T>
+class GaussianEliminationSolver : public IMatrixSolver<T>
 {
   bool usePivot = false;
 
@@ -36,6 +36,10 @@ class GaussianElimination : public IMatrixSolver<T>
         int startRow);
 
   public:
+    GaussianEliminationSolver(bool partialPivot = false) : usePivot(partialPivot) {}
+
+    void setUsePivot(bool pivot) { usePivot = pivot; }
+
     ////////////////////////////////////////////////////////////////////////////
     // fn operator()
     // brief This function operator performs the Gaussian elimination on a 
@@ -53,6 +57,7 @@ class GaussianElimination : public IMatrixSolver<T>
     //    and a constants MathVector
     // pre  constants' size must be equal to coefficients.rows()
     // post returns a matrix of size coefficients.rows() x 
+    // #include "GaussianEliminationSolverTest.h"
     //    coefficients.columns() + 1 that is an augmented matrix of the inputs
     ////////////////////////////////////////////////////////////////////////////
     static MathMatrix<T> augmentedMatrix(const IMathMatrix<T>& coefficients,
@@ -81,7 +86,7 @@ class GaussianElimination : public IMatrixSolver<T>
 };
 
 template <class T>
-int GaussianElimination<T>::getMaxColumnValueRow(const IMathMatrix<T>& matrix,
+int GaussianEliminationSolver<T>::getMaxColumnValueRow(const IMathMatrix<T>& matrix,
     int column, int startRow)
 {
   T maxSoFar = 0;
@@ -97,7 +102,8 @@ int GaussianElimination<T>::getMaxColumnValueRow(const IMathMatrix<T>& matrix,
 }
 
 template <class T>
-MathVector<T> GaussianElimination<T>::operator()(const IMathMatrix<T>& coefficients,
+MathVector<T> GaussianEliminationSolver<T>::operator()
+  (const IMathMatrix<T>& coefficients,
     const MathVector<T>& constants) const
 {
   if (coefficients.cols() != constants.size())
@@ -115,7 +121,7 @@ MathVector<T> GaussianElimination<T>::operator()(const IMathMatrix<T>& coefficie
 }
 
 template <class T>
-MathMatrix<T> GaussianElimination<T>::augmentedMatrix
+MathMatrix<T> GaussianEliminationSolver<T>::augmentedMatrix
     (const IMathMatrix<T>& A, const MathVector<T>& b)
 {
   if (A.cols() != b.size())
@@ -144,7 +150,7 @@ MathMatrix<T> GaussianElimination<T>::augmentedMatrix
 }
 
 template <class T>
-MathMatrix<T> GaussianElimination<T>::forwardElimination
+MathMatrix<T> GaussianEliminationSolver<T>::forwardElimination
     (const IMathMatrix<T>& augmented, bool partialPivot)
 {
   MathMatrix<T> result(augmented);
@@ -160,7 +166,7 @@ MathMatrix<T> GaussianElimination<T>::forwardElimination
           int swapRow = getMaxColumnValueRow(result, k, k);
           if (swapRow != k)
           {
-            result.swap(k, swapRow);
+            result.swapRows(k, swapRow);
           }
           else
           {
@@ -184,7 +190,7 @@ MathMatrix<T> GaussianElimination<T>::forwardElimination
 }
 
 template <class T>
-MathVector<T> GaussianElimination<T>::backSubstitution
+MathVector<T> GaussianEliminationSolver<T>::backSubstitution
     (const IMathMatrix<T>& augmented)
 {
   MathVector<T> result(augmented.rows());
