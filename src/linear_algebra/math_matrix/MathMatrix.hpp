@@ -78,34 +78,6 @@ void MathMatrix<T>::swap(MathMatrix<T>& other)
 }
 
 template <class T>
-MathMatrix<T>& MathMatrix<T>::opAssign(const IMathMatrix<T>& rhs)
-{
-  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
-  {
-    myColumns = rhs.cols();
-    for (auto& row : myRows)
-    {
-      delete row;
-    }
-    myRows = Array<MathVector<T>*>(rhs.rows());
-    for (auto& row : myRows)
-    {
-      row = new MathVector<T>(myColumns);
-    }
-  }
-
-  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
-  {
-    for (int j = 0; j < (int)myColumns; ++j)
-    {
-      (*(myRows.at(i)))[j] = rhs(i, j);
-    }
-  }
-
-  return *this;
-}
-
-template <class T>
 bool MathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 {
   if (myColumns != rhs.cols()) return false;

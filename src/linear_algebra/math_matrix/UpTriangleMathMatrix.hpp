@@ -83,35 +83,6 @@ void UpTriangleMathMatrix<T>::swap(UpTriangleMathMatrix<T>& other)
 }
 
 template <class T>
-UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opAssign(const IMathMatrix<T>& rhs)
-{
-  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
-  {
-    myColumns = rhs.cols();
-    for (auto& row : myRows)
-    {
-      delete row;
-    }
-    myRows = Array<MathVector<T>*>(rhs.rows());
-
-    for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
-    {
-      myRows[i] = new MathVector<T>(myColumns - i);
-    }
-  }
-
-  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
-  {
-    for (int j = 0; j < (int)myColumns; ++j)
-    {
-      if (i <= j) at(i, j) = rhs(i, j);
-    }
-  }
-
-  return *this;
-}
-
-template <class T>
 bool UpTriangleMathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 {
   if (myColumns != rhs.cols()) return false;

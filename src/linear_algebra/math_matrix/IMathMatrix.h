@@ -19,8 +19,6 @@ class IMathMatrix
   public:
     virtual ~IMathMatrix() {};
 
-    virtual IMathMatrix<T>& operator=(const IMathMatrix<T>& rhs) = 0;
-
     virtual bool operator==(const IMathMatrix<T>& rhs) const = 0;
     virtual bool operator!=(const IMathMatrix<T>& rhs) const = 0;
 

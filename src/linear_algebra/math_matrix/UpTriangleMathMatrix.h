@@ -26,12 +26,10 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix() : myColumns(0) {}
     explicit UpTriangleMathMatrix(size_t rows, size_t cols = 1);
     UpTriangleMathMatrix(const UpTriangleMathMatrix& other);
-    explicit UpTriangleMathMatrix(const IMathMatrix<T>& other);
+    UpTriangleMathMatrix(const IMathMatrix<T>& other);
     UpTriangleMathMatrix(UpTriangleMathMatrix&& other);
     ~UpTriangleMathMatrix();
 
-    using IMathMatrix<T>::operator=;
-    UpTriangleMathMatrix<T>& opAssign(const IMathMatrix<T>& rhs);
     UpTriangleMathMatrix<T>& operator=(UpTriangleMathMatrix rhs);
 
     using IMathMatrix<T>::operator==;

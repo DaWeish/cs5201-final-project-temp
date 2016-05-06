@@ -19,11 +19,6 @@
 template <class T, template <class> class Derived>
 class BaseMathMatrix : public IMathMatrix<T> {
   public:
-    virtual IMathMatrix<T>& operator=(const IMathMatrix<T>& rhs)
-    {
-      return static_cast<Derived<T>*>(this)->opAssign(rhs);
-    }
-
     virtual bool operator==(const IMathMatrix<T>& rhs) const
     {
       return static_cast<const Derived<T>*>(this)->opEquality(rhs);
