@@ -17,53 +17,58 @@
 #include "BaseMathMatrix.h"
 #include "IMathMatrix.h"
 #include "MathMatrix.h"
+#include "UpTriangleMathMatrix.h"
 
 template <class T>
 class LowTriangleMathMatrix : public BaseMathMatrix<T, LowTriangleMathMatrix>
 {
   public:
-
     LowTriangleMathMatrix() : myColumns(0) {}
-    LowTriangleMathMatrix(size_t rows, size_t cols);
+    explicit LowTriangleMathMatrix(size_t rows, size_t cols = 1);
     LowTriangleMathMatrix(const LowTriangleMathMatrix& other);
+    LowTriangleMathMatrix(const IMathMatrix<T>& other);
     LowTriangleMathMatrix(LowTriangleMathMatrix&& other);
     ~LowTriangleMathMatrix();
 
-    LowTriangleMathMatrix<T>& opAssign(const IMathMatrix<T>& rhs);
     LowTriangleMathMatrix<T>& operator=(LowTriangleMathMatrix rhs);
 
+    using IMathMatrix<T>::operator==;
+    using IMathMatrix<T>::operator!=;
     bool opEquality(const IMathMatrix<T>& rhs) const;
+    bool operator==(const LowTriangleMathMatrix& rhs) const;
+    bool operator!=(const LowTriangleMathMatrix& rhs) const;
 
-    LowTriangleMathMatrix<T>& opPlusEquals(const IMathMatrix<T>& rhs);
-    LowTriangleMathMatrix<T>& opMinusEquals(const IMathMatrix<T>& rhs);
+    LowTriangleMathMatrix& opPlusEquals(const IMathMatrix<T>& rhs);
+    LowTriangleMathMatrix& opMinusEquals(const IMathMatrix<T>& rhs);
+    LowTriangleMathMatrix& opTimesEquals(const IMathMatrix<T>& rhs);
+    LowTriangleMathMatrix& opTimesEquals(const T& scaler);
 
-    LowTriangleMathMatrix<T>& opTimesEquals(const T& scaler);
+    MathMatrix<T> operator+(const IMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix<T> operator+(const UpTriangleMathMatrix<T>& rhs) const;
+    MathMatrix<T> operator-(const IMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix<T> operator-(const UpTriangleMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix operator-() const;
+    MathMatrix<T> operator*(const IMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix operator*(const UpTriangleMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix operator*(const T& scaler) const;
+    MathVector<T> operator*(const MathVector<T>& rhs) const;
 
-    MathMatrix<T>* opPlus(const IMathMatrix<T>& rhs) const;
-    MathMatrix<T>* opMinus(const IMathMatrix<T>& rhs) const;
-    LowTriangleMathMatrix<T>* opMinus() const;
-    MathMatrix<T>* opTimes(const IMathMatrix<T>& rhs) const;
-    LowTriangleMathMatrix<T>* opTimes(const T& scaler) const;
+    UpTriangleMathMatrix<T> transpose() const;
 
-    MathVector<T>& at(size_t index);
-    const MathVector<T>& at(size_t index) const;
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
 
     size_t getRows() const;
     size_t getCols() const;
 
-    void swapRows(size_t row1, size_t row2);
+    void swap(LowTriangleMathMatrix& other);
     void printToStream(std::ostream& os) const;
     void readFromStream(std::istream& is);
 
   private:
-    void swap(LowTriangleMathMatrix& other);
-
     Array<MathVector<T>*> myRows;
-    int myColumns;
     const T zero = 0;
-    constexpr static int DEFAULT_SIZE = 2;
+    size_t myColumns;
 };
 
 #include "LowTriangleMathMatrix.hpp"
