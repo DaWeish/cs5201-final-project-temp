@@ -132,7 +132,7 @@ TEST_F(UpTriangleMathMatrixTest, Transpose)
 
   EXPECT_EQ(matrix2(0, 1), matrix1(1, 0)); 
 
-//  EXPECT_TRUE(matrix1.transpose() == matrix2);
+  EXPECT_TRUE(matrix1.transpose() == matrix2);
 }
 
 TEST_F(UpTriangleMathMatrixTest, MatrixMultiply)

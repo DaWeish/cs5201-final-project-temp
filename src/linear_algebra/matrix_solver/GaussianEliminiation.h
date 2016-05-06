@@ -1,13 +1,20 @@
-////////////////////////////////////////////////////////////////////////////////
-// author Connor Walsh
-// file   Gaussian.h
-// brief  Class to represent a gaussian elimination functor
-////////////////////////////////////////////////////////////////////////////////
+/*
+ * author Connor Walsh
+ * file   GaussianEliminationSolver.h
+ * brief  Class which implements the IMatrixSolver interface using Gaussian
+ *        Elimination
+ */
+
+#ifndef GAUSSIAN_ELIMINATION_SOLVER_H
+#define GAUSSIAN_ELIMINATION_SOLVER_H
+
+#pragma once
 
 #include <stdexcept>
 
-#include "MathMatrix2D.h"
-#include "MathVector.h"
+#include "../MathVector.h"
+#include "../math_matrix/IMathMatrix.h"
+#include "../math_matrix/MathMatrix.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // class GaussianElimination
@@ -16,13 +23,15 @@
 template <class T>
 class GaussianElimination
 {
-  protected:
+  bool usePivot = false;
+
+  private:
     ////////////////////////////////////////////////////////////////////////////
     // fn getMaxColumnValueRow
     // brief This function is used during pivoting to get the row index which
     //    is to be pivoted with the current row
     ////////////////////////////////////////////////////////////////////////////
-    static int getMaxColumnValueRow(const MathMatrix2D<T>& matrix, int column,
+    static int getMaxColumnValueRow(const IMathMatrix<T>& matrix, int column,
         int startRow);
 
   public:
@@ -34,8 +43,8 @@ class GaussianElimination
     // post returns the vector x in Ax = b where A = coefficients and
     //    b = constants
     ////////////////////////////////////////////////////////////////////////////
-    MathVector<T> operator()(const MathMatrix2D<T>& coefficients, 
-        MathVector<T> constants, bool partialPivot = false) const;
+    virtual MathVector<T> operator()
+      (const IMathMatrix<T>& A, const MathVector<T>& b) const;
 
     ////////////////////////////////////////////////////////////////////////////
     // fn augmentedMatrix
@@ -45,7 +54,7 @@ class GaussianElimination
     // post returns a matrix of size coefficients.rows() x 
     //    coefficients.columns() + 1 that is an augmented matrix of the inputs
     ////////////////////////////////////////////////////////////////////////////
-    static MathMatrix2D<T> augmentedMatrix(const MathMatrix2D<T>& coefficients,
+    static MathMatrix<T> augmentedMatrix(const IMathMatrix<T>& coefficients,
         const MathVector<T>& constants);
 
     ////////////////////////////////////////////////////////////////////////////
@@ -57,8 +66,8 @@ class GaussianElimination
     // post returns a new augmented matrix that is in eschelon form with the
     //    multipliers in the zero places
     ////////////////////////////////////////////////////////////////////////////
-    static MathMatrix2D<T> forwardElimination(MathMatrix2D<T> augmented,
-        bool partialPivot = false);
+    static MathMatrix<T> forwardElimination(const IMathMatrix<T>& augmented,
+        bool usePartialPivot = false);
 
     ////////////////////////////////////////////////////////////////////////////
     // fn backSubstitution
@@ -67,94 +76,90 @@ class GaussianElimination
     // post returns a new matrix where the rightmost column values are replaced
     //    with the solutions to the equation Ax=b represented by augmented
     ////////////////////////////////////////////////////////////////////////////
-    static MathMatrix2D<T> backSubstitution(MathMatrix2D<T> augmented);
+    static MathVector<T> backSubstitution(const IMathMatrix<T>& augmented);
 };
 
 template <class T>
-int GaussianElimination<T>::getMaxColumnValueRow(const MathMatrix2D<T>& matrix,
+int GaussianElimination<T>::getMaxColumnValueRow(const IMathMatrix<T>& matrix,
     int column, int startRow)
 {
   T maxSoFar = 0;
   for (int row = startRow, numRows = matrix.rows(); row < numRows; ++row)
   {
-    if (matrix[row][column] > maxSoFar)
+    if (matrix(row, column) > maxSoFar)
     {
       startRow = row;
-      maxSoFar = matrix[row][column];
+      maxSoFar = matrix(row, column);
     }
   }
   return startRow;
 }
 
 template <class T>
-MathVector<T> GaussianElimination<T>::operator()(const MathMatrix2D<T>& coefficients,
-    MathVector<T> constants, bool partialPivot) const
+MathVector<T> GaussianElimination<T>::operator()(const IMathMatrix<T>& coefficients,
+    const MathVector<T>& constants) const
 {
-  if (coefficients.columns() != constants.size())
+  if (coefficients.cols() != constants.size())
   {
     throw std::domain_error("Cannot perform GaussianElimination on matrix and vector"
         " of incorrect dimensions!");
   }
 
-  MathMatrix2D<T> augmented = augmentedMatrix(coefficients, constants);
-  augmented = forwardElimination(augmented, partialPivot);
-  augmented = backSubstitution(augmented);
+  MathMatrix<T> augmented = augmentedMatrix(coefficients, constants);
+  augmented = forwardElimination(augmented, usePivot);
 
-  int xLoc = augmented.columns() - 1;
-  for (int row = 0, numRows = constants.size(); row < numRows; ++row)
-  {
-    constants[row] = augmented[row][xLoc];
-  }
-  return constants;
+  MathVector<T> result = backSubstitution(augmented);
+
+  return result;
 }
 
 template <class T>
-MathMatrix2D<T> GaussianElimination<T>::augmentedMatrix
-    (const MathMatrix2D<T>& coefficients, const MathVector<T>& constants)
+MathMatrix<T> GaussianElimination<T>::augmentedMatrix
+    (const IMathMatrix<T>& A, const MathVector<T>& b)
 {
-  if (coefficients.columns() != constants.size())
+  if (A.cols() != b.size())
   {
     throw std::domain_error("Cannot perform GaussianElimination on matrix and vector"
         " of incorrect dimensions!");
   }
 
-  MathMatrix2D<T> augmented(coefficients.rows(), coefficients.columns() + 1);
+  MathMatrix<T> augmented(A.rows(), A.cols() + 1);
 
   for (int row = 0, numRows = augmented.rows(); row < numRows; ++row)
   {
-    for (int col = 0, numCols = augmented.columns(); col < numCols; ++col)
+    for (int col = 0, numCols = augmented.cols(); col < numCols; ++col)
     {
       if (col != numCols - 1)
       {
-        augmented[row][col] = coefficients[row][col];
+        augmented(row, col) = A(row, col);
       }
       else
       {
-        augmented[row][col] = constants[row];
+        augmented(row, col) = b[row];
       }
     }
   }
-
   return augmented;
 }
 
 template <class T>
-MathMatrix2D<T> GaussianElimination<T>::forwardElimination(MathMatrix2D<T> augmented,
-    bool partialPivot)
+MathMatrix<T> GaussianElimination<T>::forwardElimination
+    (const IMathMatrix<T>& augmented, bool partialPivot)
 {
-  for (int k = 0, kSize = augmented.rows() - 1; k < kSize; ++k)
+  MathMatrix<T> result(augmented);
+  for (int k = 0, kSize = result.rows() - 1; k < kSize; ++k)
   {
-    for (int i = k + 1, iSize = augmented.rows(); i < iSize; ++i)
+    for (int i = k + 1, iSize = result.rows(); i < iSize; ++i)
     {
-      if (augmented[k][k] == 0)
+      if (result(k, k) == 0)
       {
         if (partialPivot && (k != kSize - 1))
         {
           // Find max value to swap with
-          int swapRow = getMaxColumnValueRow(augmented, k, k);
+          int swapRow = getMaxColumnValueRow(result, k, k);
           if (swapRow != k)
           {
-            augmented.swap(k, swapRow);
+            result.swap(k, swapRow);
           }
           else
           {
@@ -167,20 +172,23 @@ MathMatrix2D<T> GaussianElimination<T>::forwardElimination(MathMatrix2D<T> augme
               "Elimination!");
         }
       }
-      double ratio = static_cast<double>(augmented[i][k]) / augmented[k][k];
-      for (int j = k + 1, jSize = augmented.columns(); j < jSize; ++j)
+      double ratio = static_cast<double>(result(i, k)) / result(k, k);
+      for (int j = k + 1, jSize = result.cols(); j < jSize; ++j)
       {
-        augmented[i][j] -= static_cast<T>(ratio * augmented[k][j]);
+        result(i, j) -= static_cast<T>(ratio * result(k, j));
       }
     }
   }
-  return augmented;
+  return result;
 }
 
+// TODO fix this function for use with constant input
 template <class T>
-MathMatrix2D<T> GaussianElimination<T>::backSubstitution(MathMatrix2D<T> augmented)
+MathVector<T> GaussianElimination<T>::backSubstitution
+    (const IMathMatrix<T>& augmented)
 {
-  int xLoc = augmented.columns() - 1;
+  MathVector<T> result(augmented.rows());
+  int xLoc = augmented.cols() - 1;
   for (int i = augmented.rows() - 1; i >= 0; --i)
   {
     for (int j = i + 1, jSize = augmented.rows(); j < jSize; ++j)
@@ -193,3 +201,5 @@ MathMatrix2D<T> GaussianElimination<T>::backSubstitution(MathMatrix2D<T> augment
 
   return augmented;
 }
+
+#endif

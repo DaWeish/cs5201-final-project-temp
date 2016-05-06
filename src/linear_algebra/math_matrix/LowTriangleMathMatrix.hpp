@@ -344,6 +344,21 @@ MathVector<T> LowTriangleMathMatrix<T>::operator*(const MathVector<T>& rhs) cons
 }
 
 template <class T>
+UpTriangleMathMatrix<T> LowTriangleMathMatrix<T>::transpose() const
+{
+  UpTriangleMathMatrix<T> result(myColumns, myRows.size());
+
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    for (int j = 0; j <= i; ++j)
+    {
+      result(j, i) = at(i, j);
+    }
+  }
+  return result;
+}
+
+template <class T>
 T& LowTriangleMathMatrix<T>::at(size_t row, size_t column)
 {
   if (row < column) throw std::domain_error("Cannot assign to upper values in "
