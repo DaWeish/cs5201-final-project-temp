@@ -27,9 +27,12 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
     MathMatrix(MathMatrix&& other);
     ~MathMatrix();
 
+    using IMathMatrix<T>::operator=;
     MathMatrix<T>& opAssign(const IMathMatrix<T>& rhs);
     MathMatrix<T>& operator=(MathMatrix rhs);
 
+    using IMathMatrix<T>::operator==;
+    using IMathMatrix<T>::operator!=;
     bool opEquality(const IMathMatrix<T>& rhs) const;
     bool operator==(const MathMatrix& rhs) const;
     bool operator!=(const MathMatrix& rhs) const;

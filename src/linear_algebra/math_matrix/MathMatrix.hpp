@@ -280,7 +280,8 @@ template <class T>
 MathMatrix<T> MathMatrix<T>::operator*(const T& scaler) const
 {
   MathMatrix<T> result(*this);
-  return (result *= scaler);
+  result *= scaler;
+  return result;
 }
 
 template <class T>

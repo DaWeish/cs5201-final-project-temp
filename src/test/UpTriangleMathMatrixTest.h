@@ -114,7 +114,7 @@ TEST_F(UpTriangleMathMatrixTest, Add_Sub)
   EXPECT_TRUE(matrix5 == matrix3);
   EXPECT_TRUE(matrix3 == matrix4);
 
-  MathMatrix<double> matrix6 = matrix4 - matrix2;
+  MathMatrix<double> matrix6 = (matrix4 - matrix2);
   matrix4 -= matrix2;
 
   EXPECT_TRUE(matrix4 == matrix1);
