@@ -1,18 +1,22 @@
-////////////////////////////////////////////////////////////////////////////////
-// author Connor Walsh
-// file   QRCompositor.h
-// brief  Simple Functor to implement the QR Decomposition algorithm 
-////////////////////////////////////////////////////////////////////////////////
+/*
+ * author Connor Walsh
+ * file   QRSolver.h
+ * brief  This class implements the Matrix Solver interface using the QR method
+ */
 
-#ifndef QRDECOMPOSITION_H
-#define QRDECOMPOSITION_H
+#ifndef QR_SOLVER_H
+#define QR_SOLVER_H
 
 #include <vector>
 #include <stdexcept>
 #include <iostream>
 
-#include "../linear_algebra/MathVector.h"
-#include "../linear_algebra/math_matrix/IMathMatrix.h"
+#include "IMatrixSolver.h"
+#include "../MathVector.h"
+#include "../math_matrix/IMathMatrix.h"
+#include "../math_matrix/MathMatrix.h"
+#include "../math_matrix/UpTriangleMathMatrix.h"
+#include "../math_matrix/LowTriangleMathMatrix.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // class QRDecompositor
@@ -21,8 +25,11 @@
 //    and their multipliers
 ////////////////////////////////////////////////////////////////////////////////
 template <class T>
-class QRDecompositor
+class QRSolver : public IMatrixSolver<T>
 {
+  private:
+    void QRMethod(MathMatrix<T>& A, MathMatrix<T>& Q, 
+        UpTriangleMathMatrix<T>& R, int numIter) const;
 ////////////////////////////////////////////////////////////////////////////////
 // fn operator()
 // brief This operator runs the QR Decomposition algorithm
@@ -34,20 +41,28 @@ class QRDecompositor
 // long as division by zero does not occur, otherwise an exception is thrown.
 ////////////////////////////////////////////////////////////////////////////////
   public:
-    void operator()(IMathMatrix<T>* input, IMathMatrix<T>* orthonormal,
-        IMathMatrix<T>* triangle, int numIter) const;
+    virtual MathVector<T> operator()
+      (const IMathMatrix<T>& A, const MathVector<T>& b) const;
 };
 
 template <class T>
-void QRDecompositor<T>::operator()(IMathMatrix<T>* input, IMathMatrix<T>* 
-    orthonormal, IMathMatrix<T>* triangle, int numIter) const
+MathVector<T> QRSolver<T>::operator()(const IMathMatrix<T>& A,
+    const MathVector<T>& b) const
+{
+  // TODO implement this function body
+}
+
+// TODO fix this function to work with MathMatrix correctly
+template <class T>
+void QRSolver<T>::QRMethod(MathMatrix<T>& A, MathMatrix<T>& Q,
+    UpTriangleMathMatrix<T>& R, int numIter) const
 {
   for (int a = 0; a < numIter; ++a) {
-    for (int k = 0, numRows = input->rows(); k < numRows; ++k)
+    for (int k = 0, numRows = A.rows(); k < numRows; ++k)
     {
       for (int i = 0; i < k; ++i)
       {
-        (*triangle)(k, i) = (*input)[k] * (*orthonormal)[i];
+        R(k, i) = (A)[k] * (Q)[i];
       }
 
       MathVector<T> offset(numRows);
@@ -55,22 +70,21 @@ void QRDecompositor<T>::operator()(IMathMatrix<T>* input, IMathMatrix<T>*
 
       for (int j = 0; j < k; ++j)
       {
-        offset += (*triangle)(k, j) * (*orthonormal)[j];
+        offset += R(k, j) * (Q)[j];
       }
-      orthagonalized = (*input)[k] - offset;
+      orthagonalized = (A)[k] - offset;
 
       // Calculate the kth r value
-      (*triangle)(k, k) = orthagonalized.getMagnitude();
-      if ((*triangle)(k, k) == 0)
+      (R)(k, k) = orthagonalized.getMagnitude();
+      if ((R)(k, k) == 0)
       {
         throw std::domain_error("QR method requires division by zero!");
       }
 
-      (*orthonormal)[k] = (1.0 / (*triangle)(k, k)) * orthagonalized;
+      (Q)[k] = (1.0 / (R)(k, k)) * orthagonalized;
     }
-    delete input;
-    (a % 2 == 0) ?  input = (*orthonormal) * (*triangle) :
-    input = (*triangle) * (*orthonormal);
+    A = ((a % 2 == 0) ?  Q * R : R * Q);
   }
 }
+
 #endif
