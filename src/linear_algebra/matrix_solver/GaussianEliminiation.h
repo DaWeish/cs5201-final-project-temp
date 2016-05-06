@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 
+#include "IMatrixSolver.h"
 #include "../MathVector.h"
 #include "../math_matrix/IMathMatrix.h"
 #include "../math_matrix/MathMatrix.h"
@@ -21,7 +22,7 @@
 // brief This class implements a functor for performing Gaussian Elimination
 ////////////////////////////////////////////////////////////////////////////////
 template <class T>
-class GaussianElimination
+class GaussianElimination : public IMatrixSolver<T>
 {
   bool usePivot = false;
 
@@ -182,24 +183,28 @@ MathMatrix<T> GaussianElimination<T>::forwardElimination
   return result;
 }
 
-// TODO fix this function for use with constant input
 template <class T>
 MathVector<T> GaussianElimination<T>::backSubstitution
     (const IMathMatrix<T>& augmented)
 {
   MathVector<T> result(augmented.rows());
+  T tempSolution;
   int xLoc = augmented.cols() - 1;
   for (int i = augmented.rows() - 1; i >= 0; --i)
   {
+    tempSolution = augmented(i, xLoc);
     for (int j = i + 1, jSize = augmented.rows(); j < jSize; ++j)
     {
-      augmented[i][xLoc] -= augmented[i][j] * augmented[j][xLoc];
+      tempSolution -= augmented(i, j) * result[j];
     }
-    augmented[i][xLoc] = static_cast<T>(augmented[i][xLoc] 
-        / static_cast<double>(augmented[i][i]));
+    if (augmented(i, i) == 0)
+    {
+      throw std::domain_error("Divide by zero encountered in backSubstitution!");
+    }
+    result[i] = static_cast<T>(tempSolution / static_cast<double>(augmented(i, i)));
   }
 
-  return augmented;
+  return result;
 }
 
 #endif
