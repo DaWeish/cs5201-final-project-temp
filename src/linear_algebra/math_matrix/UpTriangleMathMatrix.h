@@ -53,7 +53,7 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
 
-//    LowTriangleMathMatrix<T> transpose() const;
+    LowTriangleMathMatrix<T> transpose() const;
 
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;

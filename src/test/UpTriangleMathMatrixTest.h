@@ -128,9 +128,9 @@ TEST_F(UpTriangleMathMatrixTest, Transpose)
   matrix2(0, 1) = 3;
   matrix2(1, 1) = 5;
 
-//  MathMatrix<double> matrix1 = matrix2.transpose();
+  LowTriangleMathMatrix<double> matrix1 = matrix2.transpose();
 
-//  EXPECT_EQ(matrix1(0, 1), matrix2(1, 0)); 
+  EXPECT_EQ(matrix2(0, 1), matrix1(1, 0)); 
 
 //  EXPECT_TRUE(matrix1.transpose() == matrix2);
 }

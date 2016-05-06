@@ -7,6 +7,7 @@
 
 #include "MathMatrix.h"
 #include "UpTriangleMathMatrix.h"
+#include "LowTriangleMathMatrix.h"
 
 template <class T>
 UpTriangleMathMatrix<T>::UpTriangleMathMatrix(size_t rows, size_t cols) 
@@ -339,6 +340,21 @@ MathVector<T> UpTriangleMathMatrix<T>::operator*(const MathVector<T>& rhs) const
     result[i] = sum;
   }
   
+  return result;
+}
+
+template <class T>
+LowTriangleMathMatrix<T> UpTriangleMathMatrix<T>::transpose() const
+{
+  LowTriangleMathMatrix<T> result(myColumns, myRows.size());
+
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    for (int j = i; j < (int)myColumns; ++j)
+    {
+      result(j, i) = at(i, j);
+    }
+  }
   return result;
 }
 

@@ -7,6 +7,7 @@
 
 #include "MathMatrix.h"
 #include "LowTriangleMathMatrix.h"
+#include "UpTriangleMathMatrix.h"
 
 template <class T>
 LowTriangleMathMatrix<T>::LowTriangleMathMatrix(size_t rows, size_t cols) 
@@ -27,6 +28,21 @@ LowTriangleMathMatrix<T>::LowTriangleMathMatrix
   for (int i = 0, numRows = other.getRows(); i < numRows; ++i)
   {
     myRows[i] = new MathVector<T>(*(other.myRows[i]));
+  }
+}
+
+template <class T>
+LowTriangleMathMatrix<T>::LowTriangleMathMatrix(const IMathMatrix<T>& other)
+  : myColumns(other.cols())
+{
+  myRows = Array<MathVector<T>*>(other.rows());
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    myRows[i] = new MathVector<T>(i + 1);
+    for (int j = 0; j <= i; ++j)
+    {
+      at(i, j) = other(i, j);
+    }
   }
 }
 
@@ -68,40 +84,14 @@ void LowTriangleMathMatrix<T>::swap(LowTriangleMathMatrix<T>& other)
 }
 
 template <class T>
-LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opAssign
-    (const IMathMatrix<T>& rhs)
-{
-  if (myRows.size() != rhs.rows())
-  {
-    for (auto& row : myRows)
-    {
-      delete row;
-    }
-    myRows = Array<MathVector<T>*>(rhs.rows());
-  }
-
-  myColumns = rhs.cols();
-  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
-  {
-    myRows[i] = new MathVector<T>(i + 1);
-    for (int j = 0; j < myColumns; ++j)
-    {
-      if (i >= j) at(i, j) = rhs(i, j);
-    }
-  }
-
-  return *this;
-}
-
-template <class T>
 bool LowTriangleMathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 {
-  if (myColumns != (int)rhs.cols()) return false;
+  if (myColumns != rhs.cols()) return false;
   if (myRows.size() != rhs.rows()) return false;
 
   for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
   {
-    for (int j = 0; j < myColumns; ++j)
+    for (int j = 0; j < (int)myColumns; ++j)
     {
       if (at(i, j) != rhs(i, j)) return false;
     }
@@ -110,16 +100,36 @@ bool LowTriangleMathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 }
 
 template <class T>
+bool LowTriangleMathMatrix<T>::operator==(const LowTriangleMathMatrix<T>& rhs) const
+{
+  if (myColumns != rhs.myColumns) return false;
+  if (myRows.size() != rhs.myRows.size()) return false;
+
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    if (*(myRows[i]) != *(rhs.myRows[i])) return false;
+  }
+
+  return true;
+}
+
+template <class T>
+bool LowTriangleMathMatrix<T>::operator!=(const LowTriangleMathMatrix<T>& rhs) const
+{
+  return !(*this == rhs);
+}
+
+template <class T>
 LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opPlusEquals
     (const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
     for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (int j = 0; j < myColumns; ++j)
+      for (int j = 0; j <= i; ++j)
       {
-        if (i >= j) at(i, j) += rhs(i, j);
+        at(i, j) += rhs(i, j);
       }
     }
     return *this;
@@ -134,13 +144,13 @@ template <class T>
 LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opMinusEquals
     (const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
-    for (auto i = 0, numRows = (int)getRows(); i < numRows; ++i)
+    for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (auto j = 0; j < myColumns; ++j)
+      for (int j = 0; j <= i; ++j)
       {
-        if (i >= j) at(i, j) -= rhs(i, j);
+        at(i, j) -= rhs(i, j);
       }
     }
     return *this;
@@ -149,6 +159,15 @@ LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opMinusEquals
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
+}
+
+template <class T>
+LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opTimesEquals
+    (const IMathMatrix<T>& rhs)
+{
+  MathMatrix<T> result = (*this) * rhs;
+  (*this) = result;
+  return *this;
 }
 
 template <class T>
@@ -161,102 +180,167 @@ LowTriangleMathMatrix<T>& LowTriangleMathMatrix<T>::opTimesEquals(const T& scale
   return *this;
 }
 
+
 template <class T>
-MathMatrix<T>* LowTriangleMathMatrix<T>::opPlus(const IMathMatrix<T>& rhs) const
+MathMatrix<T> LowTriangleMathMatrix<T>::operator+(const IMathMatrix<T>& rhs) const
 {
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), myColumns);
+  MathMatrix<T> result(rhs);
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < myColumns; ++col)
+    for (int col = 0; col <= row; ++col)
     {
-      if (row >= col) result->at(row, col) = at(row, col) + rhs(row, col);
-      else result->at(row, col) = rhs(row, col);
+      result(row, col) += at(row, col);
     }
   }
   return result;
 }
 
 template <class T>
-MathMatrix<T>* LowTriangleMathMatrix<T>::opMinus(const IMathMatrix<T>& rhs) const
+LowTriangleMathMatrix<T> LowTriangleMathMatrix<T>::operator+
+    (const LowTriangleMathMatrix<T>& rhs) const
 {
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
-    throw std::domain_error("Cannot subtract two matrices of differing dimensions!");
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), myColumns);
+  LowTriangleMathMatrix<T> result(rhs);
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < myColumns; ++col)
+    *(result.myRows[row]) += *(myRows[row]);
+  }
+  return result;
+}
+
+template <class T>
+MathMatrix<T> LowTriangleMathMatrix<T>::operator-(const IMathMatrix<T>& rhs) const
+{
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
+  {
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
+  }
+
+  MathMatrix<T> result(rhs);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+    for (int col = 0; col <= row; ++col)
     {
-      if (row >= col) result->at(row, col) = at(row, col) - rhs(row, col);
-      else result->at(row, col) = -rhs(row, col);
+      result(row, col) -= at(row, col);
     }
   }
   return result;
 }
 
 template <class T>
-LowTriangleMathMatrix<T>* LowTriangleMathMatrix<T>::opMinus() const
+LowTriangleMathMatrix<T> LowTriangleMathMatrix<T>::operator-
+    (const LowTriangleMathMatrix<T>& rhs) const
 {
-  LowTriangleMathMatrix<T>* result = new LowTriangleMathMatrix<T>(*this);
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
+  {
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
+  }
+
+  LowTriangleMathMatrix<T> result(*this);
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
-    for (int col = 0; col < row; ++col)
-    {
-      result->at(row, col) = -result->at(row, col);
-    }
+    *(result.myRows[row]) -= *(rhs.myRows[row]);
   }
   return result;
 }
 
-// The if statement might be wrong for this one but cant think right now
 template <class T>
-MathMatrix<T>* LowTriangleMathMatrix<T>::opTimes(const IMathMatrix<T>& rhs) const
+LowTriangleMathMatrix<T> LowTriangleMathMatrix<T>::operator-() const
 {
-  if (myColumns != (int)rhs.rows()) {
+  LowTriangleMathMatrix<T> result(*this);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+      *(result.myRows[row]) = -(*(result.myRows[row]));
+  }
+  return result;
+}
+
+template <class T>
+MathMatrix<T> LowTriangleMathMatrix<T>::operator*(const IMathMatrix<T>& rhs) const
+{
+  if (myColumns != rhs.rows()) {
     throw std::domain_error("Cannot multiply matrices of incorrect dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), rhs.cols());
+  MathMatrix<T> result(myRows.size(), rhs.cols());
   T sum;
   for (int lhsRow = 0, numRows = myRows.size(); lhsRow < numRows; ++lhsRow)
   {
     for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
     {
       sum = 0;
-      for (int element = 0; element < myColumns; ++element)
+      for (int element = 0; element <= lhsRow; ++element)
       {
-        if (lhsRow >= element) sum += at(lhsRow, element) * rhs(element, rhsCol);
+        sum += at(lhsRow, element) * rhs(element, rhsCol);
       }
-      result->at(lhsRow, rhsCol) = sum;
+      result(lhsRow, rhsCol) = sum;
     }
   }
   return result;
 }
 
 template <class T>
-LowTriangleMathMatrix<T>* LowTriangleMathMatrix<T>::opTimes(const T& scaler) const
+LowTriangleMathMatrix<T> LowTriangleMathMatrix<T>::operator*
+    (const LowTriangleMathMatrix<T>& rhs) const
 {
-  LowTriangleMathMatrix<T>* result = new LowTriangleMathMatrix<T>(*this);
-  return &(result->opTimesEquals(scaler));
+  if (myColumns != rhs.rows()) {
+    throw std::domain_error("Cannot multiply matrices of incorrect dimensions!");
+  }
+
+  UpTriangleMathMatrix<T> result(myRows.size(), rhs.cols());
+  T sum;
+  for (int lhsRow = 0, numRows = myRows.size(); lhsRow < numRows; ++lhsRow)
+  {
+    for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
+    {
+      sum = 0;
+      for (int element = 0; element <= lhsRow; ++element)
+      {
+        sum += at(lhsRow, element) * rhs(element, rhsCol);
+      }
+      result(lhsRow, rhsCol) = sum;
+    }
+  }
+  return result;
 }
 
 template <class T>
-MathVector<T>& LowTriangleMathMatrix<T>::at(size_t index)
+LowTriangleMathMatrix<T> LowTriangleMathMatrix<T>::operator*(const T& scaler) const
 {
-  return *(myRows.at(index));
+  LowTriangleMathMatrix<T> result(*this);
+  result *= scaler;
+  return result;
 }
 
 template <class T>
-const MathVector<T>& LowTriangleMathMatrix<T>::at(size_t index) const
+MathVector<T> LowTriangleMathMatrix<T>::operator*(const MathVector<T>& rhs) const
 {
-  return *(myRows.at(index));
+  if (myColumns != rhs.size()) {
+    throw std::domain_error("Cannot multiply by MathVector of incorrect dimensions!");
+  }
+
+  T sum;
+  MathVector<T> result(myRows.size());
+  for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+  {
+    sum = 0;
+    for (int j = 0; j <= i; ++j)
+    {
+      sum += at(i, j) * rhs[j];
+    }
+    result[i] = sum;
+  }
+  
+  return result;
 }
 
 template <class T>
@@ -287,19 +371,13 @@ size_t LowTriangleMathMatrix<T>::getCols() const
 }
 
 template <class T>
-void LowTriangleMathMatrix<T>::swapRows(size_t row1, size_t row2)
-{
-  std::swap(myRows[row1], myRows[row2]);
-}
-
-template <class T>
 void LowTriangleMathMatrix<T>::printToStream(std::ostream& os) const
 {
   T value = 0;
   for (int i = 0, numRows = getRows(); i < numRows; ++i)
   {
     os << *(myRows[i]);
-    for (int j = i; j < myColumns; ++j)
+    for (int j = i; j < (int)myColumns; ++j)
       os << std::setw(10) << value << " ";
     os << "\n";
   }

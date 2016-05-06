@@ -20,6 +20,9 @@
 #include "UpTriangleMathMatrix.h"
 
 template <class T>
+class UpTriangleMathMatrix;
+
+template <class T>
 class LowTriangleMathMatrix : public BaseMathMatrix<T, LowTriangleMathMatrix>
 {
   public:
@@ -44,12 +47,12 @@ class LowTriangleMathMatrix : public BaseMathMatrix<T, LowTriangleMathMatrix>
     LowTriangleMathMatrix& opTimesEquals(const T& scaler);
 
     MathMatrix<T> operator+(const IMathMatrix<T>& rhs) const;
-    LowTriangleMathMatrix<T> operator+(const UpTriangleMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix<T> operator+(const LowTriangleMathMatrix<T>& rhs) const;
     MathMatrix<T> operator-(const IMathMatrix<T>& rhs) const;
-    LowTriangleMathMatrix<T> operator-(const UpTriangleMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix<T> operator-(const LowTriangleMathMatrix<T>& rhs) const;
     LowTriangleMathMatrix operator-() const;
     MathMatrix<T> operator*(const IMathMatrix<T>& rhs) const;
-    LowTriangleMathMatrix operator*(const UpTriangleMathMatrix<T>& rhs) const;
+    LowTriangleMathMatrix operator*(const LowTriangleMathMatrix<T>& rhs) const;
     LowTriangleMathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
 
