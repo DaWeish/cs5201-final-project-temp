@@ -23,7 +23,7 @@ template <class T>
 UpTriangleMathMatrix<T>::UpTriangleMathMatrix(const UpTriangleMathMatrix<T>& other) 
     : myColumns(other.myColumns)
 {
-  myRows = Array<MathVector<T>*>(other.getRows());
+  myRows = Array<MathVector<T>*>(other.myRows.size());
   for (int i = 0, numRows = other.getRows(); i < numRows; ++i)
   {
     myRows[i] = new MathVector<T>(*(other.myRows[i]));
@@ -70,19 +70,23 @@ void UpTriangleMathMatrix<T>::swap(UpTriangleMathMatrix<T>& other)
 template <class T>
 UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opAssign(const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() != rhs.rows())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
+    myColumns = rhs.cols();
     for (auto& row : myRows)
     {
       delete row;
     }
     myRows = Array<MathVector<T>*>(rhs.rows());
+
+    for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
+    {
+      myRows[i] = new MathVector<T>(myColumns - i);
+    }
   }
 
-  myColumns = rhs.cols();
   for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
   {
-    myRows[i] = new MathVector<T>(myColumns - i);
     for (int j = 0; j < myColumns; ++j)
     {
       if (i <= j) at(i, j) = rhs(i, j);
@@ -95,7 +99,7 @@ UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opAssign(const IMathMatrix<T>&
 template <class T>
 bool UpTriangleMathMatrix<T>::opEquality(const IMathMatrix<T>& rhs) const
 {
-  if (myColumns != (int)rhs.cols()) return false;
+  if (myColumns != rhs.cols()) return false;
   if (myRows.size() != rhs.rows()) return false;
 
   for (int i = 0, numRows = myRows.size(); i < numRows; ++i)
@@ -112,13 +116,13 @@ template <class T>
 UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opPlusEquals
     (const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
     for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (int j = 0; j < myColumns; ++j)
+      for (int j = i; j < myColumns; ++j)
       {
-        if (i <= j) at(i, j) += rhs(i, j);
+        at(i, j) += rhs(i, j);
       }
     }
     return *this;
@@ -133,13 +137,13 @@ template <class T>
 UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opMinusEquals
     (const IMathMatrix<T>& rhs)
 {
-  if (myRows.size() == rhs.rows() && myColumns == (int)rhs.cols())
+  if (myRows.size() == rhs.rows() && myColumns == rhs.cols())
   {
-    for (auto i = 0, numRows = (int)getRows(); i < numRows; ++i)
+    for (int i = 0, numRows = getRows(); i < numRows; ++i)
     {
-      for (auto j = 0; j < myColumns; ++j)
+      for (int j = i; j < myColumns; ++j)
       {
-        if (i <= j) at(i, j) -= rhs(i, j);
+        at(i, j) -= rhs(i, j);
       }
     }
     return *this;
@@ -148,6 +152,13 @@ UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opMinusEquals
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
+}
+
+template <class T>
+UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opTimesEquals
+    (const IMathMatrix<T>& rhs)
+{
+  // TODO implement this method
 }
 
 template <class T>
@@ -161,76 +172,106 @@ UpTriangleMathMatrix<T>& UpTriangleMathMatrix<T>::opTimesEquals(const T& scaler)
 }
 
 template <class T>
-MathMatrix<T>* UpTriangleMathMatrix<T>::opPlus(const IMathMatrix<T>& rhs) const
+MathMatrix<T> UpTriangleMathMatrix<T>::operator+
+    (const IMathMatrix<T>& rhs) const
 {
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
   {
     throw std::domain_error("Cannot add two matrices of differing dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), myColumns);
-  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
-  {
-    for (int col = 0; col < myColumns; ++col)
-    {
-      if (row <= col) result->at(row, col) = at(row, col) + rhs(row, col);
-      else result->at(row, col) = rhs(row, col);
-    }
-  }
-  return result;
-}
-
-template <class T>
-MathMatrix<T>* UpTriangleMathMatrix<T>::opMinus(const IMathMatrix<T>& rhs) const
-{
-  if (myRows.size() != rhs.rows() || myColumns != (int)rhs.cols())
-  {
-    throw std::domain_error("Cannot subtract two matrices of differing dimensions!");
-  }
-
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), myColumns);
-  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
-  {
-    for (int col = 0; col < myColumns; ++col)
-    {
-      if (row <= col) result->at(row, col) = at(row, col) - rhs(row, col);
-      else result->at(row, col) = -rhs(row, col);
-    }
-  }
-  return result;
-}
-
-template <class T>
-UpTriangleMathMatrix<T>* UpTriangleMathMatrix<T>::opMinus() const
-{
-  UpTriangleMathMatrix<T>* result = new UpTriangleMathMatrix<T>(*this);
+  MathMatrix<T> result(rhs);
   for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
   {
     for (int col = row; col < myColumns; ++col)
     {
-      result->at(row, col) = -result->at(row, col);
+      result(row, col) += at(row, col);
     }
   }
   return result;
 }
 
 template <class T>
-MathMatrix<T>* UpTriangleMathMatrix<T>::opTimes(const IMathMatrix<T>& rhs) const
+UpTriangleMathMatrix<T> UpTriangleMathMatrix<T>::operator+
+    (const UpTriangleMathMatrix<T>& rhs) const
 {
-  if (myColumns != (int)rhs.rows()) {
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
+  {
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
+  }
+
+  UpTriangleMathMatrix<T> result(rhs);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+    *(result.myRows[row]) += *(myRows[row]);
+  }
+  return result;
+}
+
+template <class T>
+MathMatrix<T> UpTriangleMathMatrix<T>::operator-(const IMathMatrix<T>& rhs) const
+{
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
+  {
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
+  }
+
+  MathMatrix<T> result(rhs);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+    for (int col = row; col < myColumns; ++col)
+    {
+      result(row, col) -= at(row, col);
+    }
+  }
+  return result;
+}
+
+template <class T>
+UpTriangleMathMatrix<T> UpTriangleMathMatrix<T>::operator-
+    (const UpTriangleMathMatrix<T>& rhs) const
+{
+  if (myRows.size() != rhs.rows() || myColumns != rhs.cols())
+  {
+    throw std::domain_error("Cannot add two matrices of differing dimensions!");
+  }
+
+  UpTriangleMathMatrix<T> result(rhs);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+    *(result.myRows[row]) -= *(myRows[row]);
+  }
+  return result;
+}
+
+template <class T>
+UpTriangleMathMatrix<T> UpTriangleMathMatrix<T>::operator-() const
+{
+  UpTriangleMathMatrix<T> result(*this);
+  for (int row = 0, numRows = myRows.size(); row < numRows; ++row)
+  {
+      *result.myRows[row] = -(*(result.myRows[row]));
+  }
+  return result;
+}
+
+template <class T>
+MathMatrix<T> UpTriangleMathMatrix<T>::operator*(const IMathMatrix<T>& rhs) const
+{
+  if (myColumns != rhs.rows()) {
     throw std::domain_error("Cannot multiply matrices of incorrect dimensions!");
   }
 
-  MathMatrix<T>* result = new MathMatrix<T>(myRows.size(), rhs.cols());
+  MathMatrix<T> result(myRows.size(), rhs.cols());
   T sum;
   for (int lhsRow = 0, numRows = myRows.size(); lhsRow < numRows; ++lhsRow)
   {
     for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
     {
       sum = 0;
-      for (int element = 0; element < myColumns; ++element)
+      for (int element = lhsRow; element < myColumns; ++element)
       {
-        if (lhsRow <= element) sum += at(lhsRow, element) * rhs(element, rhsCol);
+        sum += at(lhsRow, element) * rhs(element, rhsCol);
       }
       result->at(lhsRow, rhsCol) = sum;
     }
@@ -239,22 +280,35 @@ MathMatrix<T>* UpTriangleMathMatrix<T>::opTimes(const IMathMatrix<T>& rhs) const
 }
 
 template <class T>
-UpTriangleMathMatrix<T>* UpTriangleMathMatrix<T>::opTimes(const T& scaler) const
+UpTriangleMathMatrix<T> UpTriangleMathMatrix<T>::operator*
+    (const UpTriangleMathMatrix<T>& rhs) const
 {
-  UpTriangleMathMatrix<T>* result = new UpTriangleMathMatrix<T>(*this);
-  return &(result->opTimesEquals(scaler));
+  if (myColumns != rhs.rows()) {
+    throw std::domain_error("Cannot multiply matrices of incorrect dimensions!");
+  }
+
+  UpTriangleMathMatrix<T> result(myRows.size(), rhs.cols());
+  T sum;
+  for (int lhsRow = 0, numRows = myRows.size(); lhsRow < numRows; ++lhsRow)
+  {
+    for (int rhsCol = 0, numCols = rhs.cols(); rhsCol < numCols; ++rhsCol)
+    {
+      sum = 0;
+      for (int element = lhsRow; element < myColumns; ++element)
+      {
+        sum += at(lhsRow, element) * rhs(element, rhsCol);
+      }
+      result->at(lhsRow, rhsCol) = sum;
+    }
+  }
+  return result;
 }
 
 template <class T>
-MathVector<T>& UpTriangleMathMatrix<T>::at(size_t index)
+UpTriangleMathMatrix<T> UpTriangleMathMatrix<T>::operator*(const T& scaler) const
 {
-  return *(myRows.at(index));
-}
-
-template <class T>
-const MathVector<T>& UpTriangleMathMatrix<T>::at(size_t index) const
-{
-  return *(myRows.at(index));
+  UpTriangleMathMatrix<T> result(*this);
+  return (result *= scaler);
 }
 
 template <class T>
@@ -282,12 +336,6 @@ template <class T>
 size_t UpTriangleMathMatrix<T>::getCols() const
 {
   return myColumns;
-}
-
-template <class T>
-void UpTriangleMathMatrix<T>::swapRows(size_t row1, size_t row2)
-{
-  std::swap(myRows[row1], myRows[row2]);
 }
 
 template <class T>

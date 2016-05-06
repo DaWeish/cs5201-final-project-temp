@@ -17,6 +17,7 @@
 #include "BaseMathMatrix.h"
 #include "IMathMatrix.h"
 #include "MathMatrix.h"
+#include "LowTriangleMathMatrix.h"
 
 template <class T>
 class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
@@ -41,15 +42,17 @@ class UpTriangleMathMatrix : public BaseMathMatrix<T, UpTriangleMathMatrix>
     UpTriangleMathMatrix& opTimesEquals(const IMathMatrix<T>& rhs);
     UpTriangleMathMatrix& opTimesEquals(const T& scaler);
 
-    UpTriangleMathMatrix operator+(const IMathMatrix<T>& rhs) const;
-    UpTriangleMathMatrix operator-(const IMathMatrix<T>& rhs) const;
+    MathMatrix<T> operator+(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix<T> operator+(const UpTriangleMathMatrix<T>& rhs) const;
+    MathMatrix<T> operator-(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix<T> operator-(const UpTriangleMathMatrix<T>& rhs) const;
     UpTriangleMathMatrix operator-() const;
-    UpTriangleMathMatrix operator*(const IMathMatrix<T>& rhs) const;
+    MathMatrix<T> operator*(const IMathMatrix<T>& rhs) const;
+    UpTriangleMathMatrix operator*(const UpTriangleMathMatrix<T>& rhs) const;
     UpTriangleMathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
 
-    UpTriangleMathMatrix transpose() const;
-    UpTriangleMathMatrix swapRows(size_t row1, size_t row2);
+    LowTriangleMathMatrix<T> transpose() const;
 
     T& at(size_t row, size_t column);
     const T& at(size_t row, size_t column) const;
