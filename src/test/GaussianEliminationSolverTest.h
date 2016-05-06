@@ -1,8 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
-// author Connor Walsh
-// file   GaussianEliminationSolverTest.h 
-// brief  Class to represent a set of unit tests for GaussianElmination
-////////////////////////////////////////////////////////////////////////////////
+/*
+ * author Connor Walsh
+ * file   GaussianEliminationSolverTest.h
+ * brief  Class to represent a set of unit tests for Gaussian Elimination
+ */
 
 #include <stdexcept>
 
