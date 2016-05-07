@@ -26,8 +26,9 @@ int main (int argc, char** argv) {
 
   if (argc != 1 && argc != 4 && argc != 5)
   {
-    std::cout << "Usage: driver [start  end  increment]" << std::endl;
-    return 1;
+    std::cout << "Usage: driver [start  end  increment] [file friendly]"
+      << std::endl;
+    return 0;
   } 
   else if (argc >= 4)
   {
