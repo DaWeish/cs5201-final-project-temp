@@ -1,7 +1,8 @@
 /*
- * Connor Walsh
- * LowTriangleMathMatrix.h : Lower Triangular Matrix Implementing the IMathMatrix
- *  Interface. 
+ * author Connor Walsh
+ * file   LowTriangleMathMatrix.h 
+ * brief  Lower Triangular Matrix Implementing the IMathMatrix
+ *        Interface. 
  */
 
 #ifndef LOW_TRIANGLE_MATH_MATRIX_H

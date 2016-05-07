@@ -1,6 +1,7 @@
 /*
- * Connor Walsh
- * IMathMatrix.h : Interface for a Mathematical Matrix class
+ * author Connor Walsh
+ * file   IMathMatrix.h 
+ * brief  Interface for a Mathematical Matrix class
  */
 
 #ifndef I_MATH_MATRIX_H

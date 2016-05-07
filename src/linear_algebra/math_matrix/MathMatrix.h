@@ -1,6 +1,7 @@
 /*
- * Connor Walsh
- * MathMatrix.h : Standard Math Matrix following the IMathMatrix interface
+ * author Connor Walsh
+ * file   MathMatrix.h
+ * brief  Standard Math Matrix following the IMathMatrix interface
  */
 
 #ifndef MATH_MATRIX_H

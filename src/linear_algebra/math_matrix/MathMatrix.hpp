@@ -1,6 +1,7 @@
 /*
- * Connor Walsh
- * MathMatrix.hpp : Implementation file for MathMatrix class
+ * author Connor Walsh
+ * file   MathMatrix.hpp
+ * brief  Implementation file for MathMatrix class
  */
 
 #include <stdexcept>

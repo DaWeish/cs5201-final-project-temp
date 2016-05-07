@@ -1,8 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
-// author Connor Walsh
-// file   DirichletPoissonTest.h
-// brief  Class to represent a set of unit tests for DirichletPoisson class 
-////////////////////////////////////////////////////////////////////////////////
+/*
+ * author Connor Walsh
+ * file   DirichletPoissonTest.h
+ * brief  Class to represent a set of unit tests for DirichletPoisson class
+ */
 
 #include <iostream>
 #include <stdexcept>

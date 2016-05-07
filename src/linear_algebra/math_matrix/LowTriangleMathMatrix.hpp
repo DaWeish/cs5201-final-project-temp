@@ -1,6 +1,7 @@
 /*
- * Connor Walsh
- * LowTriangleMathMatrix.hpp : Implementation file for LowTriangleMathMatrix class
+ * author Connor Walsh
+ * file   LowTriangleMathMatrix.hpp
+ * brief  Implementation file for LowTriangleMathMatrix class
  */
 
 #include <stdexcept>

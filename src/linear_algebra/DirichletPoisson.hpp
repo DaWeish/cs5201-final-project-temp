@@ -1,6 +1,7 @@
 /*
- * Connor Walsh
- * DirichletPoisson.hpp : Implementation file for DirichletPoisson class
+ * author Connor Walsh
+ * file   DirichletPoisson.hpp 
+ * brief  Implementation file for DirichletPoisson class
  */
 
 #include "DirichletPoisson.h"
