@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "IMatrixSolver.h"
+#include "GaussianEliminationSolver.h"
 #include "../MathVector.h"
 #include "../math_matrix/IMathMatrix.h"
 #include "../math_matrix/MathMatrix.h"
@@ -49,10 +50,21 @@ template <class T>
 MathVector<T> QRSolver<T>::operator()(const IMathMatrix<T>& A,
     const MathVector<T>& b) const
 {
-  // TODO implement this function body
+  UpTriangleMathMatrix<double> R(A.rows(), A.cols());
+  MathMatrix<T> Q(A.rows, A.cols());
+  MathMatrix<T> input(A);
+
+  QRMethod(input, Q, R, 30);
+
+  // Rx = Q^T*b
+  MathMatrix<T> Qtranspose = Q.transpose();
+  MathVector<T> constants = Qtranspose * b;
+  MathMatrix<T> augmented = GaussianEliminationSolver<T>::augmentedMatrix
+    (Qtranspose, constants);
+
+  return GaussianEliminationSolver<T>::backSubstitution(augmented);
 }
 
-// TODO fix this function to work with MathMatrix correctly
 template <class T>
 void QRSolver<T>::QRMethod(MathMatrix<T>& A, MathMatrix<T>& Q,
     UpTriangleMathMatrix<T>& R, int numIter) const
@@ -62,7 +74,7 @@ void QRSolver<T>::QRMethod(MathMatrix<T>& A, MathMatrix<T>& Q,
     {
       for (int i = 0; i < k; ++i)
       {
-        R(k, i) = (A)[k] * (Q)[i];
+        R(k, i) = A[k] * Q[i];
       }
 
       MathVector<T> offset(numRows);
@@ -70,18 +82,18 @@ void QRSolver<T>::QRMethod(MathMatrix<T>& A, MathMatrix<T>& Q,
 
       for (int j = 0; j < k; ++j)
       {
-        offset += R(k, j) * (Q)[j];
+        offset += R(k, j) * Q[j];
       }
-      orthagonalized = (A)[k] - offset;
+      orthagonalized = A[k] - offset;
 
       // Calculate the kth r value
-      (R)(k, k) = orthagonalized.getMagnitude();
-      if ((R)(k, k) == 0)
+      R(k, k) = orthagonalized.getMagnitude();
+      if (R(k, k) == 0)
       {
         throw std::domain_error("QR method requires division by zero!");
       }
 
-      (Q)[k] = (1.0 / (R)(k, k)) * orthagonalized;
+      Q[k] = (1.0 / R(k, k)) * orthagonalized;
     }
     A = ((a % 2 == 0) ?  Q * R : R * Q);
   }

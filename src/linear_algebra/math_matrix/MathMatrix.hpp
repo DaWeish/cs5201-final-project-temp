@@ -279,6 +279,28 @@ MathVector<T> MathMatrix<T>::operator*(const MathVector<T>& rhs) const
 }
 
 template <class T>
+MathVector<T>& MathMatrix<T>::operator[](size_t index)
+{
+  if (index < 0 || index >= myRows.size())
+  {
+    throw std::length_error("Index was out of bounds to MathMatrix operator[]");
+  }
+
+  return *(myRows[index]);
+}
+
+template <class T>
+const MathVector<T>& MathMatrix<T>::operator[](size_t index) const
+{
+  if (index < 0 || index >= myRows.size())
+  {
+    throw std::length_error("Index was out of bounds to MathMatrix operator[]");
+  }
+
+  return *(myRows[index]);
+}
+
+template <class T>
 MathMatrix<T> MathMatrix<T>::transpose() const
 {
   MathMatrix<T> result(myColumns, myRows.size());

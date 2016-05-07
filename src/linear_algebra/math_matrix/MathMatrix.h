@@ -47,6 +47,9 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
     MathMatrix operator*(const T& scaler) const;
     MathVector<T> operator*(const MathVector<T>& rhs) const;
 
+    MathVector<T>& operator[](size_t index);
+    const MathVector<T>& operator[](size_t index) const;
+
     MathMatrix transpose() const;
     MathMatrix swapRows(size_t row1, size_t row2);
 
