@@ -70,8 +70,8 @@ TEST_F(DirichletPoissonTest, LargeSolve)
   MathVector<double> b = dirichlet.getSolution
     <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(25);
 
-  std::cout << "b:\n" << b << std::endl;
+ // std::cout << "b:\n" << b << std::endl;
 
   MathVector<double> actual = dirichlet.getActualSolution<Solution>(25);
-  std::cout << "actual:\n" << actual << std::endl;
+//  std::cout << "actual:\n" << actual << std::endl;
 }
