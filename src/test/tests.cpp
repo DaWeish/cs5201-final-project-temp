@@ -1,11 +1,12 @@
 #include "gtest/gtest.h"
 
-//#include "ArrayListTest.h"
 #include "MathVectorTest.h"
 #include "ArrayTest.h"
 #include "MathMatrixTest.h"
 #include "UpTriangleMathMatrixTest.h"
 #include "GaussianEliminationSolverTest.h"
+#include "QRSolverTest.h"
+#include "DirichletPoissonTest.h"
 
 int main(int argc, char** argv)
 {
