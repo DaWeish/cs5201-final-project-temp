@@ -9,6 +9,7 @@
 
 #include "gtest/gtest.h"
 #include "../linear_algebra/matrix_solver/GaussianEliminationSolver.h"
+#include "../linear_algebra/matrix_solver/QRSolver.h"
 #include "../linear_algebra/MathVector.h"
 #include "../linear_algebra/math_matrix/MathMatrix.h"
 #include "../linear_algebra/DirichletPoisson.h"
@@ -45,7 +46,7 @@ TEST_F(DirichletPoissonTest, Generate)
 
   dirichlet2.generate<FnOne, FnOne, FnOne, FnOne, FnZero>(A2, b2);
 
-  std::cout << "A:\n" << A2 << "\nb:\n" << b2 << std::endl;
+//  std::cout << "A:\n" << A2 << "\nb:\n" << b2 << std::endl;
 }
 
 TEST_F(DirichletPoissonTest, Solve)
@@ -56,10 +57,18 @@ TEST_F(DirichletPoissonTest, Solve)
   MathVector<double> b = dirichlet.getSolution
     <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(4);
 
-  std::cout << "b:\n" << b << std::endl;
+//  std::cout << "b:\n" << b << std::endl;
+
+  QRSolver<double> qrSolver;
+  DirichletPoisson<double> dirichlet2(0, 0, 1.0, qrSolver);
+
+  MathVector<double> b2 = dirichlet2.getSolution
+    <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(4);
+
+//  std::cout << "b(QR):\n" << b2 << std::endl;
 
   MathVector<double> actual = dirichlet.getActualSolution<Solution>(4);
-  std::cout << "actual:\n" << actual << std::endl;
+//  std::cout << "actual:\n" << actual << std::endl;
 }
 
 TEST_F(DirichletPoissonTest, LargeSolve)

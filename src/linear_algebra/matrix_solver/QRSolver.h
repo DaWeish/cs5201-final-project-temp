@@ -56,13 +56,13 @@ MathVector<T> QRSolver<T>::operator()(const IMathMatrix<T>& A,
   MathMatrix<T> Q(A.rows(), A.cols());
   MathMatrix<T> input(A);
 
-  QRMethod(input, Q, R, 30);
+  QRDecomposition(input, Q, R);
 
   // Rx = Q^T*b
   MathMatrix<T> Qtranspose = Q.transpose();
   MathVector<T> constants = Qtranspose * b;
   MathMatrix<T> augmented = GaussianEliminationSolver<T>::augmentedMatrix
-    (Qtranspose, constants);
+    (R, constants);
 
   return GaussianEliminationSolver<T>::backSubstitution(augmented);
 }
