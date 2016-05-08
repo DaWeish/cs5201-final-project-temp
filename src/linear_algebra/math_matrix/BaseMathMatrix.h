@@ -1,9 +1,8 @@
 /*
- * Connor Walsh
- * BaseMathMatrix.h : CRTP Base for MathMatrix interface
- *
- * This class simply forwards the polymorphic interface functions onto the
- * appropriate Derived implementation function
+ * author Connor Walsh
+ * file   BaseMathMatrix.h
+ * brief  This class simply forwards the polymorphic interface functions onto the
+ *        appropriate Derived implementation function
  */
 
 #ifndef BASE_MATH_MATRIX_H

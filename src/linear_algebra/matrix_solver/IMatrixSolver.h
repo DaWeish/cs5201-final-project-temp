@@ -1,7 +1,8 @@
 /*
- * Connor Walsh
- * IMathMatrixSolver.h : This file defines an interface used to solve matrix
- *  equations of the form Ax = b.
+ * author Connor Walsh
+ * file   IMathMatrixSolver.h 
+ * brief  This file defines an interface used to solve matrix equations of 
+ *        the form Ax = b.
  */
 
 #ifndef I_MATRIX_SOLVER_H
