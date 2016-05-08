@@ -3,6 +3,8 @@
  * file   driver.cpp
  * brief  this file profides simple testing of the DirichletPoisson class
  *        using two different types of solvers, Gaussian and QR
+ *        The input parameters can define the number of divisions to make
+ *        and whether to output in a csv type format
  */
 
 #include <iostream>

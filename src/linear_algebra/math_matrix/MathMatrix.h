@@ -47,6 +47,7 @@ class MathMatrix : public BaseMathMatrix<T, MathMatrix>
      * post   Creates a matrix that is a copy of other
      */
     MathMatrix(const MathMatrix& other);
+    MathMatrix(const IMathMatrix<T>& other);
 
     /*
      * brief  Move Constructor

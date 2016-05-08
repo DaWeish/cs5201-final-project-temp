@@ -13,9 +13,6 @@ int DirichletPoisson<T>::getPointOffset(int x, int y) const
   return (x - 1) + ((y - 1) * (numDivs - 1));
 }
 
-/*
- * pre: IMathMatrix should be square with size (numDivs - 1)^2
- */
 template <class T>
 template <T fnLow(T), T fnHigh(T), T fnLeft(T), T fnRight(T), T fnForce(T, T)>
 void DirichletPoisson<T>::generate(IMathMatrix<T>& A, MathVector<T>& b) const
