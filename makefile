@@ -23,7 +23,7 @@ TEST_MODULE_DIR := $(addprefix $(SOURCE_DIR)/,$(TEST_MODULES))
 
 CPPFLAGS =
 CXX      = /usr/bin/g++
-CXXFLAGS = -g -std=c++11 -Wall -Wextra -pedantic-errors
+CXXFLAGS = -g -std=c++11 -Wall -Wextra -O3 -pedantic-errors
 TESTFLAGS = -lgtest
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPEND_DIR)/$*.Tmpd
 

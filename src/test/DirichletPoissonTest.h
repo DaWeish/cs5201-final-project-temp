@@ -57,7 +57,7 @@ TEST_F(DirichletPoissonTest, Solve)
   MathVector<double> b = dirichlet.getSolution
     <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(4);
 
-//  std::cout << "b:\n" << b << std::endl;
+  std::cout << "b(Gauss):\n" << b << std::endl;
 
   QRSolver<double> qrSolver;
   DirichletPoisson<double> dirichlet2(0, 0, 1.0, qrSolver);
@@ -65,10 +65,10 @@ TEST_F(DirichletPoissonTest, Solve)
   MathVector<double> b2 = dirichlet2.getSolution
     <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(4);
 
-//  std::cout << "b(QR):\n" << b2 << std::endl;
+  std::cout << "b(QR):\n" << b2 << std::endl;
 
   MathVector<double> actual = dirichlet.getActualSolution<Solution>(4);
-//  std::cout << "actual:\n" << actual << std::endl;
+  std::cout << "actual:\n" << actual << std::endl;
 }
 
 TEST_F(DirichletPoissonTest, LargeSolve)
@@ -79,7 +79,7 @@ TEST_F(DirichletPoissonTest, LargeSolve)
   MathVector<double> b = dirichlet.getSolution
     <lowerBound, upperBound, leftBound, rightBound, forcingFunction>(25);
 
- // std::cout << "b:\n" << b << std::endl;
+//  std::cout << "b:\n" << b << std::endl;
 
   MathVector<double> actual = dirichlet.getActualSolution<Solution>(25);
 //  std::cout << "actual:\n" << actual << std::endl;
