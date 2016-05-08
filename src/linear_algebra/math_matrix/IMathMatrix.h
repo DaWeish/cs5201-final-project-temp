@@ -14,6 +14,13 @@
 
 #include "../MathVector.h"
 
+/*
+ * class  IMathMatrix
+ * brief  This class describes an interface for using a MathMatrix
+ *        It defines operations for a few operators, including the
+ *        function operator which acts as a two dimensional index 
+ *        operator
+ */
 template <class T>
 class IMathMatrix
 {
